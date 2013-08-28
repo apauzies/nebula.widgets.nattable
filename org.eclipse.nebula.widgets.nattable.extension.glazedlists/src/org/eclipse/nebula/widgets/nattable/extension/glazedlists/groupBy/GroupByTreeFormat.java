@@ -10,8 +10,11 @@
  ******************************************************************************/
 package org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy;
 
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.eclipse.nebula.widgets.nattable.config.DefaultComparator;
 import org.eclipse.nebula.widgets.nattable.data.IColumnAccessor;
@@ -48,7 +51,7 @@ public class GroupByTreeFormat<T> implements TreeList.Format<Object> {
 	 * @param columnAccessor The IColumnAccessor that is used to get the column value 
 	 * 			for the columns that are grouped by. Needed for compare operations and
 	 * 			creating the path in the tree.
-	 */
+	 */			
 	public GroupByTreeFormat(GroupByModel model, IColumnAccessor<T> columnAccessor) {
 		this.model = model;
 		this.columnAccessor = columnAccessor;
@@ -57,11 +60,12 @@ public class GroupByTreeFormat<T> implements TreeList.Format<Object> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void getPath(List<Object> path, Object element) {
-		int groupByIndex = 0;
+		List<Entry<Integer, Object>> descriptor = new ArrayList<Entry<Integer, Object>>();
 		for (int columnIndex : model.getGroupByColumnIndexes()) {
 			//add a GroupByObject that contains the value contained in the column which is grouped
 			Object columnValue = columnAccessor.getDataValue((T) element, columnIndex);
-			path.add(new GroupByObject(groupByIndex++, columnValue));
+			descriptor.add(new AbstractMap.SimpleEntry<Integer, Object>(columnIndex, columnValue));
+			path.add(new GroupByObject(columnValue, descriptor));
 		}
 
 		path.add(element);

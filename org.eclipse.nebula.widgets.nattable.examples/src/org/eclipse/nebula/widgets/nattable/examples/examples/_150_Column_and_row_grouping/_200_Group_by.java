@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.nebula.widgets.nattable.examples.examples._150_Column_and_row_grouping;
 
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -24,6 +25,9 @@ import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupBy
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByHeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByModel;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.aggregator.Aggregator;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.aggregator.Aggregator.IAggregator;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.aggregator.BasicAggregators;
 import org.eclipse.nebula.widgets.nattable.freeze.CompositeFreezeLayer;
 import org.eclipse.nebula.widgets.nattable.freeze.FreezeLayer;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
@@ -85,7 +89,13 @@ public class _200_Group_by extends AbstractNatExample {
 		
 		GroupByModel groupByModel = new GroupByModel();
 		
-		GroupByDataLayer<RowDataFixture> bodyDataLayer = new GroupByDataLayer<RowDataFixture>(groupByModel, eventList, reflectiveColumnPropertyAccessor);
+		// Aggregator
+		final Map<Integer, IAggregator<RowDataFixture, ?>> aggregatorByColumn = new HashMap<Integer, IAggregator<RowDataFixture,?>>();
+		aggregatorByColumn.put(8, BasicAggregators.<RowDataFixture>sum());
+		final Aggregator<RowDataFixture> aggregator = new Aggregator<RowDataFixture>(groupByModel, eventList, reflectiveColumnPropertyAccessor, aggregatorByColumn);
+
+		GroupByDataLayer<RowDataFixture> bodyDataLayer = new GroupByDataLayer<RowDataFixture>(groupByModel, eventList, reflectiveColumnPropertyAccessor, aggregator.getColumnAccessor());		
+//		GroupByDataLayer<RowDataFixture> bodyDataLayer = new GroupByDataLayer<RowDataFixture>(groupByModel, eventList, reflectiveColumnPropertyAccessor);		
 		
 		// Body layer
 		ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(bodyDataLayer);

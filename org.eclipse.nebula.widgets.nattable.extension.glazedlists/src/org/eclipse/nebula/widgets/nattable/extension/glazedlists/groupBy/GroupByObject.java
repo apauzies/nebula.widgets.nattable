@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy;
 
+import java.util.List;
+import java.util.Map.Entry;
+
 import org.eclipse.nebula.widgets.nattable.config.DefaultComparator;
 
 /**
@@ -19,31 +22,22 @@ import org.eclipse.nebula.widgets.nattable.config.DefaultComparator;
  */
 public class GroupByObject implements Comparable<GroupByObject> {
 
-	/**
-	 * The order index of the grouping.
-	 */
-	private final Integer groupByIndex;
+	/** The columnIndex->value */
+	private final List<Entry<Integer, Object>> descriptor;
 	/**
 	 * The value that is used for grouping.
 	 */
 	private final Object value;
-	
-	/**
-	 * @param groupByIndex The order index of the grouping.
-	 * @param value The value that is used for grouping.
-	 */
-	public GroupByObject(int groupByIndex, Object value) {
-		this.groupByIndex = groupByIndex;
-		this.value = value;
-	}
 
 	/**
-	 * @return The order index of the grouping.
+	 * @param value The value that is used for grouping.
+	 * @param descriptor The description of the grouping (Index->Value)
 	 */
-	public int getGroupByIndex() {
-		return groupByIndex;
+	public GroupByObject(Object value, List<Entry<Integer, Object>> descriptor) {
+		this.value = value;
+		this.descriptor = descriptor;
 	}
-	
+
 	/**
 	 * @return The value that is used for grouping.
 	 */
@@ -51,6 +45,13 @@ public class GroupByObject implements Comparable<GroupByObject> {
 		return value;
 	}
 	
+	/**
+	 * @return The description of the grouping (Index->Value)
+	 */
+	public List<Entry<Integer, Object>> getDescriptor() {
+		return descriptor;
+	}
+
 	@Override
 	public String toString() {
 		//Without adjusting a lot of API and adding dependencies to the DataLayer and the ConfigRegistry
@@ -62,9 +63,17 @@ public class GroupByObject implements Comparable<GroupByObject> {
 	@Override
 	public int compareTo(GroupByObject o) {
 		//if we have several groupings, the comparison is performed on the group by order
-		int result = this.groupByIndex.compareTo(o.groupByIndex);
+		int result = Integer.valueOf(getDescriptor().size()).compareTo(o.getDescriptor().size());
 		
 		if (result == 0) {
+
+			for (int i = 0; i < getDescriptor().size(); i++) {
+				result = getDescriptor().get(i).getKey().compareTo(o.getDescriptor().get(i).getKey());
+				if (result != 0) {
+					return result;
+				}
+			}
+			
 			//if the datatypes are not the same here, comparison is not possible
 			if (this.value == null || o.value == null || this.value.getClass().equals(o.value.getClass())) {
 				result = DefaultComparator.getInstance().compare(value, o.value);
@@ -78,7 +87,7 @@ public class GroupByObject implements Comparable<GroupByObject> {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + groupByIndex;
+		result = prime * result + ((descriptor == null) ? 0 : descriptor.hashCode());
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
@@ -92,7 +101,10 @@ public class GroupByObject implements Comparable<GroupByObject> {
 		if (getClass() != obj.getClass())
 			return false;
 		GroupByObject other = (GroupByObject) obj;
-		if (groupByIndex != other.groupByIndex)
+		if (descriptor == null) {
+			if (other.descriptor != null)
+				return false;
+		} else if (!descriptor.equals(other.descriptor))
 			return false;
 		if (value == null) {
 			if (other.value != null)
@@ -101,5 +113,5 @@ public class GroupByObject implements Comparable<GroupByObject> {
 			return false;
 		return true;
 	}
-	
+
 }

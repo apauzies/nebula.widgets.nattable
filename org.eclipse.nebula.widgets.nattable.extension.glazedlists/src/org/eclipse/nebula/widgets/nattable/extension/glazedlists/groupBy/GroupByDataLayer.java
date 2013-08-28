@@ -16,6 +16,7 @@ import java.util.Observer;
 
 import org.eclipse.nebula.widgets.nattable.data.IColumnAccessor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsDataProvider;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.aggregator.Aggregator.AggregatorColumnAccessor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.tree.GlazedListTreeData;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.tree.GlazedListTreeRowModel;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
@@ -48,8 +49,12 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 	 */
 	private final TreeList<Object> treeList;
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public GroupByDataLayer(GroupByModel groupByModel, EventList<T> eventList, IColumnAccessor<T> columnAccessor) {
+		this(groupByModel, eventList, columnAccessor, null);
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public GroupByDataLayer(GroupByModel groupByModel, EventList<T> eventList, IColumnAccessor<T> columnAccessor, AggregatorColumnAccessor aggregatorColumnAccessor) {
 		this.eventList = eventList;
 		
 		groupByModel.addObserver(this);
@@ -60,10 +65,12 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 		treeData = new GlazedListTreeData<Object>(getTreeList());
 		treeRowModel = new GlazedListTreeRowModel<Object>(treeData);
 		
-		IColumnAccessor<Object> groupByColumnAccessor = new GroupByColumnAccessor<T>(columnAccessor);
+		IColumnAccessor<Object> groupByColumnAccessor = aggregatorColumnAccessor == null ? new GroupByColumnAccessor<T>(columnAccessor) : aggregatorColumnAccessor;
 		setDataProvider(new GlazedListsDataProvider<Object>(getTreeList(), groupByColumnAccessor));
 		
-		addConfiguration(new GroupByDataLayerConfiguration());
+		if (aggregatorColumnAccessor == null) {
+			addConfiguration(new GroupByDataLayerConfiguration());
+		}
 	}
 	
 	/**
