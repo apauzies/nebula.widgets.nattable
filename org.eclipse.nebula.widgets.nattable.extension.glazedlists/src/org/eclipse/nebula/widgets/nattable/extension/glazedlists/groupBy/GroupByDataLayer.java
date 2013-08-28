@@ -22,6 +22,7 @@ import org.eclipse.nebula.widgets.nattable.extension.glazedlists.tree.GlazedList
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.event.RowStructuralRefreshEvent;
+import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.TreeList;
@@ -49,6 +50,8 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 	 */
 	private final TreeList<Object> treeList;
 	
+	private final GroupByTreeFormat<T> treeFormat;
+	
 	public GroupByDataLayer(GroupByModel groupByModel, EventList<T> eventList, IColumnAccessor<T> columnAccessor) {
 		this(groupByModel, eventList, columnAccessor, null);
 	}
@@ -59,7 +62,7 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 		
 		groupByModel.addObserver(this);
 		
-		TreeList.Format<Object> treeFormat = new GroupByTreeFormat<T>(groupByModel, columnAccessor);
+		treeFormat = new GroupByTreeFormat<T>(groupByModel, columnAccessor, aggregatorColumnAccessor);
 		this.treeList = new TreeList(eventList, treeFormat, new GroupByExpansionModel());
 		
 		treeData = new GlazedListTreeData<Object>(getTreeList());
@@ -71,6 +74,10 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 		if (aggregatorColumnAccessor == null) {
 			addConfiguration(new GroupByDataLayerConfiguration());
 		}
+	}
+	
+	public void setSortModel(ISortModel model) {
+		treeFormat.setSortModel(model);
 	}
 	
 	/**

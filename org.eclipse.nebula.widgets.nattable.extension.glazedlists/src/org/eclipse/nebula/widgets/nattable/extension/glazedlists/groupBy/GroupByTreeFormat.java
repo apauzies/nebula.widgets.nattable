@@ -18,6 +18,8 @@ import java.util.Map.Entry;
 
 import org.eclipse.nebula.widgets.nattable.config.DefaultComparator;
 import org.eclipse.nebula.widgets.nattable.data.IColumnAccessor;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.aggregator.Aggregator.AggregatorColumnAccessor;
+import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 
 import ca.odell.glazedlists.TreeList;
 
@@ -44,17 +46,32 @@ public class GroupByTreeFormat<T> implements TreeList.Format<Object> {
 	 * Comparator that is used to sort the TreeList based on the groupBy information.
 	 */
 	private final GroupByComparator groupByComparator = new GroupByComparator();
+	/**
+	 * To provide sorting functionality
+	 */
+	private ISortModel sortModel;
+	/**
+	 * Only used for sorting with aggregated values on summary/group row
+	 */
+	private AggregatorColumnAccessor aggregatorColumnAccessor;
 
+
+	public GroupByTreeFormat(GroupByModel model, IColumnAccessor<T> columnAccessor) {
+		this(model,columnAccessor,null);
+	}
+	
 	/**
 	 * 
 	 * @param model The GroupByModel that carries the information about the groupBy states.
 	 * @param columnAccessor The IColumnAccessor that is used to get the column value 
 	 * 			for the columns that are grouped by. Needed for compare operations and
 	 * 			creating the path in the tree.
+	 * @param aggregatorColumnAccessor Only used for sorting with aggregated values on summary/group row
 	 */			
-	public GroupByTreeFormat(GroupByModel model, IColumnAccessor<T> columnAccessor) {
+	public GroupByTreeFormat(GroupByModel model, IColumnAccessor<T> columnAccessor, AggregatorColumnAccessor aggregatorColumnAccessor) {
 		this.model = model;
 		this.columnAccessor = columnAccessor;
+		this.aggregatorColumnAccessor = aggregatorColumnAccessor;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -86,6 +103,10 @@ public class GroupByTreeFormat<T> implements TreeList.Format<Object> {
 		return this.groupByComparator;
 	}
 	
+	public void setSortModel(ISortModel model) {
+		sortModel = model;
+	}
+	
 	/**
 	 * Comparator that is used to sort the TreeList based on the groupBy information.
 	 * 
@@ -93,7 +114,7 @@ public class GroupByTreeFormat<T> implements TreeList.Format<Object> {
 	 *
 	 */
 	class GroupByComparator implements Comparator<Object> {
-
+		
 		@SuppressWarnings("unchecked")
 		@Override
 		public int compare(Object o1, Object o2) {
@@ -115,6 +136,29 @@ public class GroupByTreeFormat<T> implements TreeList.Format<Object> {
 						columnValue1 = o1;
 						columnValue2 = o2;
 						result = ((GroupByObject)o1).compareTo((GroupByObject)o2);
+						
+						if (result != 0) {
+							if (sortModel != null && aggregatorColumnAccessor != null) {
+								// Compare aggregated columns
+								for (int sortedColumnIndex : sortModel.getSortedColumnIndexes()) {
+									if (o1 instanceof GroupByObject && o2 instanceof GroupByObject) {
+										columnValue1 = aggregatorColumnAccessor.getDataValue((T) o1, sortedColumnIndex);
+										columnValue2 = aggregatorColumnAccessor.getDataValue((T) o2, sortedColumnIndex);
+										int res = DefaultComparator.getInstance().compare(columnValue1, columnValue2);
+										if (res == 0) {
+											continue;
+										}
+										switch (sortModel.getSortDirection(sortedColumnIndex)) {
+											case ASC:
+												result = res;
+												break;
+											case DESC:
+												result = res * -1;
+										}
+									}
+								}
+							}
+						}
 					}
 					else if (o1 instanceof GroupByObject && !(o2 instanceof GroupByObject)) {
 						result = 1;
