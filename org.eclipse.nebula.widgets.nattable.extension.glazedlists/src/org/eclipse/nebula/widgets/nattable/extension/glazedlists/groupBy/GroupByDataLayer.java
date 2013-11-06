@@ -11,8 +11,11 @@
 package org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.nebula.widgets.nattable.data.IColumnAccessor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsDataProvider;
@@ -25,10 +28,14 @@ import org.eclipse.nebula.widgets.nattable.layer.event.RowStructuralRefreshEvent
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 
 import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.TreeList;
+import ca.odell.glazedlists.matchers.Matcher;
 
 public class GroupByDataLayer<T> extends DataLayer implements Observer {
 
+	/** Map the group to a dynamic list of group elements */
+	private final Map<GroupByObject, FilterList<T>> filtersByGroup = new ConcurrentHashMap<GroupByObject, FilterList<T>>();
 	/**
 	 * Label that indicates the shown tree item object as GroupByObject
 	 */
@@ -56,9 +63,12 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 		this(groupByModel, eventList, columnAccessor, null);
 	}
 	
+	private final IColumnAccessor<T> columnAccessor;
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public GroupByDataLayer(GroupByModel groupByModel, EventList<T> eventList, IColumnAccessor<T> columnAccessor, AggregatorColumnAccessor aggregatorColumnAccessor) {
 		this.eventList = eventList;
+		this.columnAccessor = columnAccessor;
 		
 		groupByModel.addObserver(this);
 		
@@ -68,12 +78,12 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 		treeData = new GlazedListTreeData<Object>(getTreeList());
 		treeRowModel = new GlazedListTreeRowModel<Object>(treeData);
 		
-		IColumnAccessor<Object> groupByColumnAccessor = aggregatorColumnAccessor == null ? new GroupByColumnAccessor<T>(columnAccessor) : aggregatorColumnAccessor;
+		IColumnAccessor<Object> groupByColumnAccessor = aggregatorColumnAccessor == null ? new GroupByColumnAccessor<T>(columnAccessor) : aggregatorColumnAccessor;		
 		setDataProvider(new GlazedListsDataProvider<Object>(getTreeList(), groupByColumnAccessor));
 		
-		if (aggregatorColumnAccessor == null) {
-			addConfiguration(new GroupByDataLayerConfiguration());
-		}
+//		if (aggregatorColumnAccessor == null) {
+//			addConfiguration(new GroupByDataLayerConfiguration());
+//		}
 	}
 	
 	public void setSortModel(ISortModel model) {
@@ -156,6 +166,46 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 		public void setExpanded(final Object element, final List<Object> path, final boolean expanded) {
 			//do nothing
 		}
+	}
+	
+	/**
+	 * To find out if an element is part of a group
+	 */
+	public static class GroupDescriptorMatcher<T> implements Matcher<T> {
+
+		private final GroupByObject group;
+		private final IColumnAccessor<T> columnAccessor;
+
+		public GroupDescriptorMatcher(GroupByObject group, IColumnAccessor<T> columnAccessor) {
+			this.group = group;
+			this.columnAccessor = columnAccessor;
+		}
+
+		@Override
+		public boolean matches(T element) {
+			for (Entry<Integer, Object> desc : group.getDescriptor()) {
+				int columnIndex = desc.getKey();
+				Object groupName = desc.getValue();
+				if (!groupName.equals(columnAccessor.getDataValue((T) element, columnIndex))) {
+					return false;
+				}
+			}
+			return true;
+		}
+	}
+
+	/**
+	 * Get the list of elements for a group, create it if it doesn't exists.
+	 * @param groupDescriptor The description of the group (columnIndexes..)
+	 * @return The FilterList of elements
+	 */
+	public FilterList<T> getElementsInGroup(GroupByObject groupDescriptor) {
+		FilterList<T> elementsInGroup = filtersByGroup.get(groupDescriptor);
+		if (elementsInGroup == null) {
+			elementsInGroup = new FilterList<T>(eventList, new GroupDescriptorMatcher<T>(groupDescriptor, columnAccessor));
+			filtersByGroup.put(groupDescriptor, elementsInGroup);
+		}
+		return elementsInGroup;
 	}
 
 }
