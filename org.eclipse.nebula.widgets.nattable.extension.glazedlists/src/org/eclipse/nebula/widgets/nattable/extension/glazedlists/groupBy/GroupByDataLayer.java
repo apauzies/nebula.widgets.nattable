@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IColumnAccessor;
@@ -31,13 +30,10 @@ import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 
 import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.TreeList;
 
 public class GroupByDataLayer<T> extends DataLayer implements Observer {
 
-	/** Map the group to a dynamic list of group elements */
-	private final Map<GroupByObject, FilterList<T>> filtersByGroup = new ConcurrentHashMap<GroupByObject, FilterList<T>>();
 	/**
 	 * Label that indicates the shown tree item object as GroupByObject
 	 */
@@ -68,8 +64,6 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 
 	private final GroupByTreeFormat<T> treeFormat;
 
-	private final IColumnAccessor<T> columnAccessor;
-
 	public GroupByDataLayer(GroupByModel groupByModel, EventList<T> eventList, IColumnAccessor<T> columnAccessor) {
 		this(groupByModel, eventList, columnAccessor, null);
 	}
@@ -78,7 +72,6 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 	public GroupByDataLayer(GroupByModel groupByModel, EventList<T> eventList, IColumnAccessor<T> columnAccessor,
 			IConfigRegistry configRegistry) {
 		this.eventList = eventList;
-		this.columnAccessor = columnAccessor;
 
 		groupByModel.addObserver(this);
 
@@ -92,7 +85,7 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 		} else {
 			 columnAccessor = new GroupByColumnAccessor<T>(columnAccessor);
 		}
-
+		
 		treeFormat = new GroupByTreeFormat<T>(groupByModel, columnAccessor);
 		this.treeList = new TreeList(eventList, treeFormat, new GroupByExpansionModel());
 		treeData = new GlazedListTreeData<Object>(getTreeList());
