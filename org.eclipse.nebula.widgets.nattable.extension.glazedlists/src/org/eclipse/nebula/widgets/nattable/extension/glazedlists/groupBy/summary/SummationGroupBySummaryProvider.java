@@ -3,7 +3,6 @@ package org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summar
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.data.IColumnAccessor;
-import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByObject;
 
 public class SummationGroupBySummaryProvider<T> implements IGroupBySummaryProvider<T> {
 
