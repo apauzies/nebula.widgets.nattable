@@ -10,13 +10,12 @@
  ******************************************************************************/
 package org.eclipse.nebula.widgets.nattable.examples.examples._150_Column_and_row_grouping;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
-import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
-import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.ReflectiveColumnPropertyAccessor;
@@ -26,9 +25,9 @@ import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupBy
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByHeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByModel;
-import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.GroupSummationSummaryProvider;
-import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.SummaryGroupConfigAttributes;
-import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.SummaryGroupRowLayer;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.GroupBySummaryConfigAttributes;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.IGroupBySummaryProvider;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.SummationGroupBySummaryProvider;
 import org.eclipse.nebula.widgets.nattable.freeze.CompositeFreezeLayer;
 import org.eclipse.nebula.widgets.nattable.freeze.FreezeLayer;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
@@ -44,8 +43,6 @@ import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.CompositeLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnOverrideLabelAccumulator;
-import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
-import org.eclipse.nebula.widgets.nattable.painter.cell.TextPainter;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
@@ -63,7 +60,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.graphics.GC;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
@@ -81,24 +77,6 @@ public class _200_Group_by extends AbstractNatExample {
 				+ "If you right-click on the names in the Group By region, you can ungroup by the clicked column.";
 	}
 
-	private void setupColumnPainters(IConfigRegistry configRegistry) {
-		TextPainter textPainter = new TextPainter() {
-
-			@Override
-			protected String getTextToDisplay(ILayerCell cell, GC gc, int availableLength, String text) {
-				if (cell.getConfigLabels().hasLabel(GroupByDataLayer.GROUP_BY_OBJECT)) {
-					if (cell.getColumnPosition() == 1) {
-						return text;
-					}
-					return "";
-				}
-				return text;
-			}
-		};
-		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, textPainter, DisplayMode.NORMAL,
-				"Grid");
-	}
-
 	public Control createExampleControl(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
 		comp.setLayout(new GridLayout(1, false));
@@ -112,20 +90,19 @@ public class _200_Group_by extends AbstractNatExample {
 
 		GroupByModel groupByModel = new GroupByModel();
 
-		GroupByDataLayer<RowDataFixture> bodyDataLayer = new GroupByDataLayer<RowDataFixture>(groupByModel, eventList,
-				reflectiveColumnPropertyAccessor, null);
-
 		// Summary
-		IConfigRegistry configRegistry = new ConfigRegistry();
-		configRegistry.registerConfigAttribute(SummaryGroupConfigAttributes.SUMMARY_GROUP_PROVIDER,
-				new GroupSummationSummaryProvider<RowDataFixture>(reflectiveColumnPropertyAccessor),
-				DisplayMode.NORMAL, SummaryGroupRowLayer.DEFAULT_SUMMARY_ROW_CONFIG_LABEL);
-		SummaryGroupRowLayer<RowDataFixture> summaryLayer = new SummaryGroupRowLayer<RowDataFixture>(bodyDataLayer,
-				configRegistry, false);
-		setupColumnPainters(configRegistry);
+		ConfigRegistry configRegistry = new ConfigRegistry();
+		Map<Integer,IGroupBySummaryProvider> summaryProviderByColumn = new HashMap<Integer,IGroupBySummaryProvider>();
+		summaryProviderByColumn.put(8, new SummationGroupBySummaryProvider<RowDataFixture>(reflectiveColumnPropertyAccessor));		
+		configRegistry.registerConfigAttribute(GroupBySummaryConfigAttributes.GROUP_BY_SUMMARY_PROVIDER,
+				summaryProviderByColumn,
+				DisplayMode.NORMAL);
+		
+		GroupByDataLayer<RowDataFixture> bodyDataLayer = new GroupByDataLayer<RowDataFixture>(groupByModel, eventList,
+				reflectiveColumnPropertyAccessor, configRegistry);	
 
 		// Body layer
-		ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(summaryLayer);
+		ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(bodyDataLayer);
 		ColumnHideShowLayer columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
 		SelectionLayer selectionLayer = new SelectionLayer(columnHideShowLayer);
 
@@ -153,7 +130,7 @@ public class _200_Group_by extends AbstractNatExample {
 		labelAccumulator.registerColumnOverrides(
 				RowDataListFixture.getColumnIndexOfProperty(RowDataListFixture.RATING_PROP_NAME),
 				"CUSTOM_COMPARATOR_LABEL");
-		labelAccumulator.registerColumnOverrides(8, SummaryGroupRowLayer.SUMMARIZE);
+		labelAccumulator.registerColumnOverrides(8, GroupByDataLayer.SUMMARIZE);
 
 		// Row header layer
 		DefaultRowHeaderDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(

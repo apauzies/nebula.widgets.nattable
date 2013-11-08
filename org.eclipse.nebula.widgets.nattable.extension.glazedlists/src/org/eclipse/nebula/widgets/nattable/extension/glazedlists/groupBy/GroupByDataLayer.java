@@ -17,15 +17,18 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IColumnAccessor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsDataProvider;
-import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.aggregator.Aggregator.AggregatorColumnAccessor;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.GroupBySummaryConfigAttributes;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.IGroupBySummaryProvider;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.tree.GlazedListTreeData;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.tree.GlazedListTreeRowModel;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.event.RowStructuralRefreshEvent;
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
+import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;
@@ -41,6 +44,11 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 	 */
 	public static final String GROUP_BY_OBJECT = "GROUP_BY_OBJECT"; //$NON-NLS-1$
 	/**
+	 * Label that indicates the shown tree item object should summarize its
+	 * children
+	 */
+	public static final String SUMMARIZE = "SUMMARIZE"; //$NON-NLS-1$
+	/**
 	 * The underlying base EventList.
 	 */
 	private final EventList<T> eventList;
@@ -49,60 +57,70 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 	 */
 	private final GlazedListTreeData<Object> treeData;
 	/**
-	 * The ITreeRowModel that is responsible to retrieve information and operate on tree items.
+	 * The ITreeRowModel that is responsible to retrieve information and operate
+	 * on tree items.
 	 */
 	private final GlazedListTreeRowModel<Object> treeRowModel;
 	/**
-	 * The TreeList that is created internally by this GroupByDataLayer to enable groupBy.
+	 * The TreeList that is created internally by this GroupByDataLayer to
+	 * enable groupBy.
 	 */
 	private final TreeList<Object> treeList;
-	
+
 	private final GroupByTreeFormat<T> treeFormat;
-	
+
+	private final IColumnAccessor<T> columnAccessor;
+
 	public GroupByDataLayer(GroupByModel groupByModel, EventList<T> eventList, IColumnAccessor<T> columnAccessor) {
 		this(groupByModel, eventList, columnAccessor, null);
 	}
-	
-	private final IColumnAccessor<T> columnAccessor;
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public GroupByDataLayer(GroupByModel groupByModel, EventList<T> eventList, IColumnAccessor<T> columnAccessor, AggregatorColumnAccessor aggregatorColumnAccessor) {
+	public GroupByDataLayer(GroupByModel groupByModel, EventList<T> eventList, IColumnAccessor<T> columnAccessor,
+			IConfigRegistry configRegistry) {
 		this.eventList = eventList;
 		this.columnAccessor = columnAccessor;
-		
+
 		groupByModel.addObserver(this);
-		
-		treeFormat = new GroupByTreeFormat<T>(groupByModel, columnAccessor, aggregatorColumnAccessor);
+
+		// Check if we need to summarize some group columns
+		if (configRegistry != null) {
+			Map<Integer, IGroupBySummaryProvider> summaryProviderByColumn = configRegistry.getConfigAttribute(
+					GroupBySummaryConfigAttributes.GROUP_BY_SUMMARY_PROVIDER, DisplayMode.NORMAL);
+			if (!summaryProviderByColumn.isEmpty()) {
+				columnAccessor = new GroupBySummaryColumnAccessor(columnAccessor, summaryProviderByColumn);
+			}
+		}
+
+		treeFormat = new GroupByTreeFormat<T>(groupByModel, columnAccessor);
 		this.treeList = new TreeList(eventList, treeFormat, new GroupByExpansionModel());
-		
+
 		treeData = new GlazedListTreeData<Object>(getTreeList());
 		treeRowModel = new GlazedListTreeRowModel<Object>(treeData);
-		
-		IColumnAccessor<Object> groupByColumnAccessor = aggregatorColumnAccessor == null ? new GroupByColumnAccessor<T>(columnAccessor) : aggregatorColumnAccessor;		
-		setDataProvider(new GlazedListsDataProvider<Object>(getTreeList(), groupByColumnAccessor));
-		
-//		if (aggregatorColumnAccessor == null) {
-//			addConfiguration(new GroupByDataLayerConfiguration());
-//		}
+
+		setDataProvider(new GlazedListsDataProvider<Object>(getTreeList(), (IColumnAccessor<Object>) columnAccessor));
+
+		addConfiguration(new GroupByDataLayerConfiguration());
 	}
-	
+
 	public void setSortModel(ISortModel model) {
 		treeFormat.setSortModel(model);
 	}
-	
+
 	/**
 	 * Method to update the tree list after filter or TreeList.Format changed.
 	 * Need this workaround to update the tree list for presentation because of
 	 * http://java.net/jira/browse/GLAZEDLISTS-521
 	 * 
-	 * @see http://glazedlists.1045722.n5.nabble.com/sorting-a-treelist-td4704550.html
+	 * @see http 
+	 *      ://glazedlists.1045722.n5.nabble.com/sorting-a-treelist-td4704550
+	 *      .html
 	 */
 	protected void updateTree() {
 		this.eventList.getReadWriteLock().writeLock().lock();
 		try {
 			for (int i = 0; i < this.eventList.size(); i++) {
-				this.eventList.set(i,
-						this.eventList.get(i));
+				this.eventList.set(i, this.eventList.get(i));
 			}
 		} finally {
 			this.eventList.getReadWriteLock().writeLock().unlock();
@@ -116,19 +134,21 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 	}
 
 	/**
-	 * @return The ITreeRowModel that is responsible to retrieve information and operate on tree items.
+	 * @return The ITreeRowModel that is responsible to retrieve information and
+	 *         operate on tree items.
 	 */
 	public GlazedListTreeRowModel<Object> getTreeRowModel() {
 		return treeRowModel;
 	}
-	
+
 	/**
-	 * @return The TreeList that is created internally by this GroupByDataLayer to enable groupBy.
+	 * @return The TreeList that is created internally by this GroupByDataLayer
+	 *         to enable groupBy.
 	 */
 	public TreeList<Object> getTreeList() {
 		return treeList;
 	}
-	
+
 	@Override
 	public LabelStack getConfigLabelsByPosition(int columnPosition, int rowPosition) {
 		LabelStack configLabels = super.getConfigLabelsByPosition(columnPosition, rowPosition);
@@ -137,6 +157,67 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 		}
 		return configLabels;
 	}
+
+	// @Override
+	// public Object getDataValueByPosition(int columnPosition, int rowPosition)
+	// {
+	// if (isSummaryPosition(columnPosition, rowPosition)) {
+	// GroupByObject group = (GroupByObject)
+	// super.getDataValueByPosition(columnPosition, rowPosition);
+	// Object summaryValue = calculateNewSummaryValue(group, rowPosition,
+	// columnPosition);
+	// group.summaryValueByColumn.put(columnPosition, summaryValue);
+	// return summaryValue;
+	// }
+	// return super.getDataValueByPosition(columnPosition, rowPosition);
+	// }
+
+	// protected boolean isSummaryPosition(int columnPosition, int rowPosition)
+	// {
+	// ILayerCell cell = getCellByPosition(columnPosition, rowPosition);
+	// if (cell == null) {
+	// return false;
+	// }
+	// return cell.getConfigLabels().hasLabel(SUMMARIZE)
+	// && cell.getConfigLabels().hasLabel(GroupByDataLayer.GROUP_BY_OBJECT);
+	// }
+
+	// private Object calculateNewSummaryValue(final GroupByObject group, final
+	// int rowPosition, final int columnPosition) {
+	//
+	// // Get the summary provider from the configuration registry
+	// LabelStack labelStack = getConfigLabelsByPosition(columnPosition,
+	// rowPosition);
+	//
+	// @SuppressWarnings("unchecked")
+	// final IGroupBySummaryProvider<T> summaryProvider =
+	// (IGroupBySummaryProvider<T>) configRegistry
+	// .getConfigAttribute(GroupBySummaryConfigAttributes.SUMMARY_GROUP_PROVIDER,
+	// DisplayMode.NORMAL,
+	// labelStack.getLabels());
+	//
+	// // If there is no Summary provider - skip processing
+	// if (summaryProvider == IGroupBySummaryProvider.NONE) {
+	//			return ""; //$NON-NLS-1$
+	// }
+	//
+	// // List<Integer> childRowIndexes = ((TreeLayer) //
+	// // underlyingLayer).getModel().getChildIndexes(rowPosition);
+	// List<T> children = getElementsInGroup(group);
+	//
+	// Object summaryValue = calculateGroupSummary(columnPosition, children,
+	// summaryProvider);
+	// return summaryValue;
+	// }
+
+	// private Object calculateGroupSummary(int columnIndex, List<T> children,
+	// IGroupBySummaryProvider<T> summaryProvider) {
+	// Object summaryValue = null;
+	// if (summaryProvider != null) {
+	// summaryValue = summaryProvider.summarize(columnIndex, children);
+	// }
+	// return summaryValue;
+	// }
 
 	/**
 	 * Simple {@link ExpansionModel} that shows every node expanded initially
@@ -164,10 +245,10 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 		 */
 		@Override
 		public void setExpanded(final Object element, final List<Object> path, final boolean expanded) {
-			//do nothing
+			// do nothing
 		}
 	}
-	
+
 	/**
 	 * To find out if an element is part of a group
 	 */
@@ -196,16 +277,49 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 
 	/**
 	 * Get the list of elements for a group, create it if it doesn't exists.
-	 * @param groupDescriptor The description of the group (columnIndexes..)
+	 * 
+	 * @param groupDescriptor
+	 *            The description of the group (columnIndexes..)
 	 * @return The FilterList of elements
 	 */
 	public FilterList<T> getElementsInGroup(GroupByObject groupDescriptor) {
 		FilterList<T> elementsInGroup = filtersByGroup.get(groupDescriptor);
 		if (elementsInGroup == null) {
-			elementsInGroup = new FilterList<T>(eventList, new GroupDescriptorMatcher<T>(groupDescriptor, columnAccessor));
+			elementsInGroup = new FilterList<T>(eventList, new GroupDescriptorMatcher<T>(groupDescriptor,
+					columnAccessor));
 			filtersByGroup.put(groupDescriptor, elementsInGroup);
 		}
 		return elementsInGroup;
 	}
 
+	public class GroupBySummaryColumnAccessor extends GroupByColumnAccessor<T> {
+
+		private final Map<Integer, IGroupBySummaryProvider> summaryProviderByColumn;
+
+		public GroupBySummaryColumnAccessor(IColumnAccessor<T> columnAccessor,
+				Map<Integer, IGroupBySummaryProvider> summaryProviderByColumn) {
+			super(columnAccessor);
+			this.summaryProviderByColumn = summaryProviderByColumn;
+		}
+
+		@SuppressWarnings("unchecked")
+		public Object getDataValue(Object rowObject, int columnIndex) {
+			if (rowObject instanceof GroupByObject) {
+				IGroupBySummaryProvider<T> summaryProvider = summaryProviderByColumn.get(columnIndex);
+				GroupByObject groupByObject = (GroupByObject) rowObject;
+				if (summaryProvider == null) {
+					if (columnIndex == 0) {
+						return groupByObject.getValue(); // Print the name of
+															// the
+															// group
+					}
+					return ""; //$NON-NLS-1$ // No aggregation, print nothing
+				}
+				List<T> children = (List<T>) getElementsInGroup(groupByObject);
+				return summaryProvider.summarize(columnIndex, children);
+			} else {
+				return columnAccessor.getDataValue((T) rowObject, columnIndex);
+			}
+		}
+	}
 }
