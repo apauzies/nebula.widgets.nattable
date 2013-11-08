@@ -35,6 +35,7 @@ import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.widget.EditModeEnum;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
@@ -155,6 +156,8 @@ public abstract class AbstractDialogCellEditor implements ICellEditor, ICellEdit
 				configRegistry, EditConfigAttributes.VALIDATION_ERROR_HANDLER, configLabels);
 
 		this.dialog = createDialogInstance();
+		
+		setCanonicalValue(originalCanonicalValue);
 		
 		//this method is only needed to initialize the dialog editor, there will be no control to return
 		return null;
@@ -425,6 +428,14 @@ public abstract class AbstractDialogCellEditor implements ICellEditor, ICellEdit
 	@Override
 	public void removeEditorControlListeners() {
 		//there is no need for special editor control listeners here
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.nebula.widgets.nattable.edit.editor.ICellEditor#calculateControlBounds(org.eclipse.swt.graphics.Rectangle)
+	 */
+	@Override
+	public Rectangle calculateControlBounds(Rectangle cellBounds) {
+		return cellBounds;
 	}
 
 	/* (non-Javadoc)

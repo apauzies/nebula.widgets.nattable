@@ -39,6 +39,7 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
@@ -123,13 +124,13 @@ public abstract class AbstractCellEditor implements ICellEditor {
 	 * The {@link FocusListener} that will be added to the created editor control
 	 * for {@link EditModeEnum#INLINE} to close it if it loses focus.
 	 */
-	private FocusListener focusListener = new InlineFocusListener();
+	protected FocusListener focusListener = new InlineFocusListener();
 	
 	/**
 	 * The {@link TraverseListener} that will be added to the created editor control
 	 * for {@link EditModeEnum#INLINE} trying to commit the editor prior to traversal.
 	 */
-	private TraverseListener traverseListener = new InlineTraverseListener();
+	protected TraverseListener traverseListener = new InlineTraverseListener();
 	
 	@Override
 	public final Control activateCell(Composite parent, Object originalCanonicalValue, EditModeEnum editMode, 
@@ -435,6 +436,11 @@ public abstract class AbstractCellEditor implements ICellEditor {
 			editorControl.removeFocusListener(this.focusListener);
 			editorControl.removeTraverseListener(this.traverseListener);
 		}
+	}
+	
+	@Override
+	public Rectangle calculateControlBounds(Rectangle cellBounds) {
+		return cellBounds;
 	}
 	
 	/**

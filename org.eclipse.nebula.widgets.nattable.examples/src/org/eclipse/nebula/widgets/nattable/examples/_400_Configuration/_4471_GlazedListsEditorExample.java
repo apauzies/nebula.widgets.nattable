@@ -93,10 +93,10 @@ import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.TransformedList;
 
 
-public class _4261_GlazedListsEditorExample extends AbstractNatExample {
+public class _4471_GlazedListsEditorExample extends AbstractNatExample {
 
 	public static void main(String[] args) throws Exception {
-		StandaloneNatExampleRunner.run(1024, 400, new _4261_GlazedListsEditorExample());
+		StandaloneNatExampleRunner.run(1024, 400, new _4471_GlazedListsEditorExample());
 	}
 	
 	@Override
@@ -341,14 +341,14 @@ public class _4261_GlazedListsEditorExample extends AbstractNatExample {
 					EditConfigAttributes.CELL_EDITOR, 
 					new TextCellEditor(true, true), 
 					DisplayMode.NORMAL, 
-					_4261_GlazedListsEditorExample.COLUMN_TWO_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_TWO_LABEL);
 			
 			//configure to open the adjacent editor after commit
 			configRegistry.registerConfigAttribute(
 					EditConfigAttributes.OPEN_ADJACENT_EDITOR,
 					Boolean.TRUE,
 					DisplayMode.EDIT,
-					_4261_GlazedListsEditorExample.COLUMN_TWO_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_TWO_LABEL);
 			
 			//configure a custom message for the multi edit dialog
 			Map<String, Object> editDialogSettings = new HashMap<String, Object>();
@@ -358,7 +358,7 @@ public class _4261_GlazedListsEditorExample extends AbstractNatExample {
 					EditConfigAttributes.EDIT_DIALOG_SETTINGS, 
 					editDialogSettings,
 					DisplayMode.EDIT,
-					_4261_GlazedListsEditorExample.COLUMN_TWO_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_TWO_LABEL);
 		}
 		
 		private void registerColumnThreePasswordEditor(IConfigRegistry configRegistry) {
@@ -367,14 +367,14 @@ public class _4261_GlazedListsEditorExample extends AbstractNatExample {
 					EditConfigAttributes.CELL_EDITOR, 
 					new PasswordCellEditor(), 
 					DisplayMode.NORMAL, 
-					_4261_GlazedListsEditorExample.COLUMN_THREE_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_THREE_LABEL);
 			
 			//configure the password editor to not support multi editing
 			configRegistry.registerConfigAttribute(
 					EditConfigAttributes.SUPPORT_MULTI_EDIT, 
 					Boolean.FALSE, 
 					DisplayMode.EDIT, 
-					_4261_GlazedListsEditorExample.COLUMN_THREE_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_THREE_LABEL);
 			
 			//note that you should also register the corresponding PasswordTextPainter
 			//to ensure that the password is not rendered in clear text
@@ -382,7 +382,7 @@ public class _4261_GlazedListsEditorExample extends AbstractNatExample {
 					CellConfigAttributes.CELL_PAINTER, 
 					new PasswordTextPainter(), 
 					DisplayMode.NORMAL, 
-					_4261_GlazedListsEditorExample.COLUMN_THREE_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_THREE_LABEL);
 		}
 		
 		private void registerColumnFourMultiLineEditor(IConfigRegistry configRegistry) {
@@ -391,14 +391,14 @@ public class _4261_GlazedListsEditorExample extends AbstractNatExample {
 					EditConfigAttributes.CELL_EDITOR, 
 					new MultiLineTextCellEditor(false), 
 					DisplayMode.NORMAL, 
-					_4261_GlazedListsEditorExample.COLUMN_FOUR_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_FOUR_LABEL);
 			
 			//configure the multi line text editor to always open in a subdialog
 			configRegistry.registerConfigAttribute(
 					EditConfigAttributes.OPEN_IN_DIALOG,
 					Boolean.TRUE,
 					DisplayMode.EDIT,
-					_4261_GlazedListsEditorExample.COLUMN_FOUR_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_FOUR_LABEL);
 			
 			Style cellStyle = new Style();
 			cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
@@ -406,12 +406,12 @@ public class _4261_GlazedListsEditorExample extends AbstractNatExample {
 					CellConfigAttributes.CELL_STYLE, 
 					cellStyle,
 					DisplayMode.NORMAL,
-					_4261_GlazedListsEditorExample.COLUMN_FOUR_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_FOUR_LABEL);
 			configRegistry.registerConfigAttribute(
 					CellConfigAttributes.CELL_STYLE, 
 					cellStyle,
 					DisplayMode.EDIT,
-					_4261_GlazedListsEditorExample.COLUMN_FOUR_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_FOUR_LABEL);
 			
 			//configure custom dialog settings
 			Display display = Display.getCurrent();
@@ -435,7 +435,7 @@ public class _4261_GlazedListsEditorExample extends AbstractNatExample {
 					EditConfigAttributes.EDIT_DIALOG_SETTINGS, 
 					editDialogSettings,
 					DisplayMode.EDIT,
-					_4261_GlazedListsEditorExample.COLUMN_FOUR_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_FOUR_LABEL);
 		}
 		
 		private void registerColumnFiveIntegerEditor(IConfigRegistry configRegistry) {
@@ -444,28 +444,28 @@ public class _4261_GlazedListsEditorExample extends AbstractNatExample {
 					EditConfigAttributes.CELL_EDITOR, 
 					new TextCellEditor(false, true), 
 					DisplayMode.NORMAL, 
-					_4261_GlazedListsEditorExample.COLUMN_FIVE_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_FIVE_LABEL);
 			
 			//configure to open the adjacent editor after commit
 			configRegistry.registerConfigAttribute(
 					EditConfigAttributes.OPEN_ADJACENT_EDITOR,
 					Boolean.TRUE,
 					DisplayMode.EDIT,
-					_4261_GlazedListsEditorExample.COLUMN_FIVE_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_FIVE_LABEL);
 			
 			//configure to open always in dialog to show the tick update in normal mode
 			configRegistry.registerConfigAttribute(
 					EditConfigAttributes.OPEN_IN_DIALOG,
 					Boolean.TRUE,
 					DisplayMode.EDIT,
-					_4261_GlazedListsEditorExample.COLUMN_FIVE_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_FIVE_LABEL);
 			
 			//don't forget to register the Integer converter!
 			configRegistry.registerConfigAttribute(
 					CellConfigAttributes.DISPLAY_CONVERTER, 
 					new DefaultIntegerDisplayConverter(), 
 					DisplayMode.NORMAL,
-					_4261_GlazedListsEditorExample.COLUMN_FIVE_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_FIVE_LABEL);
 		}
 		
 		private void registerColumnSixDoubleEditor(IConfigRegistry configRegistry) {
@@ -474,35 +474,35 @@ public class _4261_GlazedListsEditorExample extends AbstractNatExample {
 					EditConfigAttributes.CELL_EDITOR, 
 					new TextCellEditor(false, true), 
 					DisplayMode.NORMAL, 
-					_4261_GlazedListsEditorExample.COLUMN_SIX_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_SIX_LABEL);
 			
 			//configure to open the adjacent editor after commit
 			configRegistry.registerConfigAttribute(
 					EditConfigAttributes.OPEN_ADJACENT_EDITOR,
 					Boolean.TRUE,
 					DisplayMode.EDIT,
-					_4261_GlazedListsEditorExample.COLUMN_SIX_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_SIX_LABEL);
 			
 			//configure to open always in dialog to show the tick update in normal mode
 			configRegistry.registerConfigAttribute(
 					EditConfigAttributes.OPEN_IN_DIALOG,
 					Boolean.TRUE,
 					DisplayMode.EDIT,
-					_4261_GlazedListsEditorExample.COLUMN_SIX_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_SIX_LABEL);
 			
 			//configure the tick update dialog to use the adjust mode
 			configRegistry.registerConfigAttribute(
 					TickUpdateConfigAttributes.USE_ADJUST_BY,
 					Boolean.TRUE,
 					DisplayMode.EDIT,
-					_4261_GlazedListsEditorExample.COLUMN_SIX_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_SIX_LABEL);
 			
 			//don't forget to register the Double converter!
 			configRegistry.registerConfigAttribute(
 					CellConfigAttributes.DISPLAY_CONVERTER, 
 					new DefaultDoubleDisplayConverter(), 
 					DisplayMode.NORMAL,
-					_4261_GlazedListsEditorExample.COLUMN_SIX_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_SIX_LABEL);
 		}
 		
 		/**
@@ -523,7 +523,7 @@ public class _4261_GlazedListsEditorExample extends AbstractNatExample {
 					EditConfigAttributes.CELL_EDITOR, 
 					new CheckBoxCellEditor(), 
 					DisplayMode.EDIT, 
-					_4261_GlazedListsEditorExample.COLUMN_SEVEN_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_SEVEN_LABEL);
 			
 			//if you want to use the CheckBoxCellEditor, you should also consider
 			//using the corresponding CheckBoxPainter to show the content like a
@@ -532,14 +532,14 @@ public class _4261_GlazedListsEditorExample extends AbstractNatExample {
 					CellConfigAttributes.CELL_PAINTER, 
 					new CheckBoxPainter(), 
 					DisplayMode.NORMAL, 
-					_4261_GlazedListsEditorExample.COLUMN_SEVEN_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_SEVEN_LABEL);
 			
 			//using a CheckBoxCellEditor also needs a Boolean conversion to work correctly
 			configRegistry.registerConfigAttribute(
 					CellConfigAttributes.DISPLAY_CONVERTER, 
 					new DefaultBooleanDisplayConverter(), 
 					DisplayMode.NORMAL, 
-					_4261_GlazedListsEditorExample.COLUMN_SEVEN_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_SEVEN_LABEL);
 		}
 		
 		/**
@@ -562,7 +562,7 @@ public class _4261_GlazedListsEditorExample extends AbstractNatExample {
 					EditConfigAttributes.CELL_EDITOR, 
 					new CheckBoxCellEditor(), 
 					DisplayMode.EDIT, 
-					_4261_GlazedListsEditorExample.COLUMN_EIGHT_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_EIGHT_LABEL);
 			
 			//if you want to use the CheckBoxCellEditor, you should also consider
 			//using the corresponding CheckBoxPainter to show the content like a
@@ -572,14 +572,14 @@ public class _4261_GlazedListsEditorExample extends AbstractNatExample {
 					CellConfigAttributes.CELL_PAINTER, 
 					new CheckBoxPainter(GUIHelper.getImage("arrow_up"), GUIHelper.getImage("arrow_down")), 
 					DisplayMode.NORMAL, 
-					_4261_GlazedListsEditorExample.COLUMN_EIGHT_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_EIGHT_LABEL);
 			
 			//using a CheckBoxCellEditor also needs a Boolean conversion to work correctly
 			configRegistry.registerConfigAttribute(
 					CellConfigAttributes.DISPLAY_CONVERTER, 
 					getGenderBooleanConverter(), 
 					DisplayMode.NORMAL, 
-					_4261_GlazedListsEditorExample.COLUMN_EIGHT_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_EIGHT_LABEL);
 		}
 		
 		/**
@@ -601,7 +601,7 @@ public class _4261_GlazedListsEditorExample extends AbstractNatExample {
 					EditConfigAttributes.CELL_EDITOR, 
 					comboBoxCellEditor, 
 					DisplayMode.EDIT, 
-					_4261_GlazedListsEditorExample.COLUMN_NINE_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_NINE_LABEL);
 		}
 		
 		/**
@@ -620,13 +620,13 @@ public class _4261_GlazedListsEditorExample extends AbstractNatExample {
 					EditConfigAttributes.CELL_EDITOR, 
 					comboBoxCellEditor, 
 					DisplayMode.EDIT, 
-					_4261_GlazedListsEditorExample.COLUMN_TEN_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_TEN_LABEL);
 			
 			configRegistry.registerConfigAttribute(
 					CellConfigAttributes.CELL_PAINTER, 
 					new ComboBoxPainter(), 
 					DisplayMode.NORMAL, 
-					_4261_GlazedListsEditorExample.COLUMN_TEN_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_TEN_LABEL);
 		}
 		
 		/**
@@ -666,14 +666,14 @@ public class _4261_GlazedListsEditorExample extends AbstractNatExample {
 						}
 					}, 
 					DisplayMode.NORMAL, 
-					_4261_GlazedListsEditorExample.COLUMN_ELEVEN_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_ELEVEN_LABEL);
 			
 			comboBoxCellEditor.setIconImage(GUIHelper.getImage("plus"));
 			configRegistry.registerConfigAttribute(
 					EditConfigAttributes.CELL_EDITOR, 
 					comboBoxCellEditor, 
 					DisplayMode.EDIT, 
-					_4261_GlazedListsEditorExample.COLUMN_ELEVEN_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_ELEVEN_LABEL);
 		}
 		
 		/**
@@ -695,14 +695,14 @@ public class _4261_GlazedListsEditorExample extends AbstractNatExample {
 					EditConfigAttributes.CELL_EDITOR, 
 					comboBoxCellEditor, 
 					DisplayMode.EDIT, 
-					_4261_GlazedListsEditorExample.COLUMN_TWELVE_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_TWELVE_LABEL);
 			
 			
 			configRegistry.registerConfigAttribute(
 					CellConfigAttributes.CELL_PAINTER, 
 					new ComboBoxPainter(GUIHelper.getImage("plus")), 
 					DisplayMode.NORMAL, 
-					_4261_GlazedListsEditorExample.COLUMN_TWELVE_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_TWELVE_LABEL);
 		}
 		
 		/**
@@ -716,7 +716,7 @@ public class _4261_GlazedListsEditorExample extends AbstractNatExample {
 					EditConfigAttributes.CELL_EDITOR, 
 					new FileDialogCellEditor(), 
 					DisplayMode.EDIT, 
-					_4261_GlazedListsEditorExample.COLUMN_THIRTEEN_LABEL);
+					_4471_GlazedListsEditorExample.COLUMN_THIRTEEN_LABEL);
 		}
 		
 		/**

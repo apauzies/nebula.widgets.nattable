@@ -25,7 +25,11 @@ import org.eclipse.swt.widgets.ScrollBar;
 public class VerticalScrollBarHandler extends ScrollBarHandlerTemplate implements Listener {
 
 	public VerticalScrollBarHandler(ViewportLayer viewportLayer, ScrollBar scrollBar) {
-		super(viewportLayer, scrollBar);
+		this(viewportLayer, new ScrollBarScroller(scrollBar));
+	}
+	
+	public VerticalScrollBarHandler(ViewportLayer viewportLayer, IScroller<?> scroller) {
+		super(viewportLayer, scroller);
 	}
 
 	/**
@@ -65,7 +69,11 @@ public class VerticalScrollBarHandler extends ScrollBarHandlerTemplate implement
 
 	@Override
 	int getScrollableLayerSpan() {
-		return scrollableLayer.getHeight();
+		if (viewportLayer.getMaxHeight() >= 0 && viewportLayer.getMaxHeight() < scrollableLayer.getHeight()) {
+			return viewportLayer.getMaxHeight();
+		} else {
+			return scrollableLayer.getHeight();
+		}
 	}
 	
 	@Override
