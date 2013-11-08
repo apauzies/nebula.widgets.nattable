@@ -3,6 +3,7 @@ package org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summar
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.data.IColumnAccessor;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByObject;
 
 public class SummationGroupBySummaryProvider<T> implements IGroupBySummaryProvider<T> {
 
@@ -15,7 +16,7 @@ public class SummationGroupBySummaryProvider<T> implements IGroupBySummaryProvid
 	@Override
 	public Object summarize(int columnIndex, List<T> children) {
 		float summaryValue = 0;
-		for (T child : children) {
+		for (T child : children) {			
 			Object dataValue = columnAccessor.getDataValue(child, columnIndex);
 			if (dataValue instanceof Number) {
 				summaryValue = summaryValue + Float.parseFloat(dataValue.toString());

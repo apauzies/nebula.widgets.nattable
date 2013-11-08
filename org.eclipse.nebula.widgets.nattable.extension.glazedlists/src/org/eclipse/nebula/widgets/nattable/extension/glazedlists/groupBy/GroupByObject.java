@@ -63,11 +63,10 @@ public class GroupByObject implements Comparable<GroupByObject> {
 		// we can then inject the necessary values. Until then you should
 		// consider implementing toString()
 		return value.toString();
-	}
+	}	
 
 	@Override
 	public int compareTo(GroupByObject o) {
-
 		int size1 = getDescriptor().size();
 		int size2 = o.getDescriptor().size();
 

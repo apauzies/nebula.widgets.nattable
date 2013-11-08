@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,7 +33,6 @@ import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.TreeList;
-import ca.odell.glazedlists.matchers.Matcher;
 
 public class GroupByDataLayer<T> extends DataLayer implements Observer {
 
@@ -90,11 +89,12 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 			if (!summaryProviderByColumn.isEmpty()) {
 				columnAccessor = new GroupBySummaryColumnAccessor(columnAccessor, summaryProviderByColumn);
 			}
+		} else {
+			 columnAccessor = new GroupByColumnAccessor<T>(columnAccessor);
 		}
 
 		treeFormat = new GroupByTreeFormat<T>(groupByModel, columnAccessor);
 		this.treeList = new TreeList(eventList, treeFormat, new GroupByExpansionModel());
-
 		treeData = new GlazedListTreeData<Object>(getTreeList());
 		treeRowModel = new GlazedListTreeRowModel<Object>(treeData);
 
@@ -249,47 +249,16 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 		}
 	}
 
-	/**
-	 * To find out if an element is part of a group
-	 */
-	public static class GroupDescriptorMatcher<T> implements Matcher<T> {
-
-		private final GroupByObject group;
-		private final IColumnAccessor<T> columnAccessor;
-
-		public GroupDescriptorMatcher(GroupByObject group, IColumnAccessor<T> columnAccessor) {
-			this.group = group;
-			this.columnAccessor = columnAccessor;
-		}
-
-		@Override
-		public boolean matches(T element) {
-			for (Entry<Integer, Object> desc : group.getDescriptor()) {
-				int columnIndex = desc.getKey();
-				Object groupName = desc.getValue();
-				if (!groupName.equals(columnAccessor.getDataValue((T) element, columnIndex))) {
-					return false;
-				}
+	public List<T> getElementsInGroup(GroupByObject groupDescriptor) {
+		List<T> children = new ArrayList<T>();
+		for (Object o : treeData.getChildren(groupDescriptor)) {
+			if (o instanceof GroupByObject) {
+				children.addAll(getElementsInGroup((GroupByObject) o));
+			} else {
+				children.add((T) o);
 			}
-			return true;
 		}
-	}
-
-	/**
-	 * Get the list of elements for a group, create it if it doesn't exists.
-	 * 
-	 * @param groupDescriptor
-	 *            The description of the group (columnIndexes..)
-	 * @return The FilterList of elements
-	 */
-	public FilterList<T> getElementsInGroup(GroupByObject groupDescriptor) {
-		FilterList<T> elementsInGroup = filtersByGroup.get(groupDescriptor);
-		if (elementsInGroup == null) {
-			elementsInGroup = new FilterList<T>(eventList, new GroupDescriptorMatcher<T>(groupDescriptor,
-					columnAccessor));
-			filtersByGroup.put(groupDescriptor, elementsInGroup);
-		}
-		return elementsInGroup;
+		return children;
 	}
 
 	public class GroupBySummaryColumnAccessor extends GroupByColumnAccessor<T> {
@@ -315,7 +284,7 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 					}
 					return ""; //$NON-NLS-1$ // No aggregation, print nothing
 				}
-				List<T> children = (List<T>) getElementsInGroup(groupByObject);
+				List<T> children = getElementsInGroup(groupByObject);
 				return summaryProvider.summarize(columnIndex, children);
 			} else {
 				return columnAccessor.getDataValue((T) rowObject, columnIndex);
