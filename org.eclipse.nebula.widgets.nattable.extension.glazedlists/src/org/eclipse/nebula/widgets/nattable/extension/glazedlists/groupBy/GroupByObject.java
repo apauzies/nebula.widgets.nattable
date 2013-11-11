@@ -54,9 +54,9 @@ public class GroupByObject implements Comparable<GroupByObject> {
 
 	@Override
 	public String toString() {
-		// Without adjusting a lot of API and adding dependencies to the DataLayer and the ConfigRegistry
-		// we can not get the IDataConverter here. It might be solvable with the next generation because
-		// we can then inject the necessary values. Until then you should consider implementing toString()
+		//Without adjusting a lot of API and adding dependencies to the DataLayer and the ConfigRegistry
+		//we can not get the IDataConverter here. It might be solvable with the next generation because
+		//we can then inject the necessary values. Until then you should consider implementing toString()
 		return value.toString();
 	}
 

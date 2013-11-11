@@ -72,9 +72,10 @@ public class _200_Group_by extends AbstractNatExample {
 
 	@Override
 	public String getDescription() {
-		return "This example has a 'Group By' region at the top.\n"
-				+ "If you drag a column header into this region, rows in the grid will be grouped by this column.\n"
-				+ "If you right-click on the names in the Group By region, you can ungroup by the clicked column.";
+		return
+			"This example has a 'Group By' region at the top.\n" +
+			"If you drag a column header into this region, rows in the grid will be grouped by this column.\n" +
+			"If you right-click on the names in the Group By region, you can ungroup by the clicked column.";
 	}
 
 	public Control createExampleControl(Composite parent) {
@@ -115,12 +116,11 @@ public class _200_Group_by extends AbstractNatExample {
 		CompositeFreezeLayer compFreeze = new CompositeFreezeLayer(freeze, viewportLayer, selectionLayer);
 
 		// Column header layer
-		final IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(propertyNames,
-				propertyToLabelMap);
+		final IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(propertyNames, propertyToLabelMap);
 		final DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
 		ColumnHeaderLayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, compFreeze, selectionLayer);
-		// Note: The column header layer is wrapped in a filter row composite.
-		// This plugs in the filter row functionality
+		//  Note: The column header layer is wrapped in a filter row composite.
+		//  This plugs in the filter row functionality
 
 		ColumnOverrideLabelAccumulator labelAccumulator = new ColumnOverrideLabelAccumulator(columnHeaderDataLayer);
 		columnHeaderDataLayer.setConfigLabelAccumulator(labelAccumulator);
@@ -133,8 +133,7 @@ public class _200_Group_by extends AbstractNatExample {
 		labelAccumulator.registerColumnOverrides(8, GroupByDataLayer.SUMMARIZE);
 
 		// Row header layer
-		DefaultRowHeaderDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(
-				bodyDataLayer.getDataProvider());
+		DefaultRowHeaderDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(bodyDataLayer.getDataProvider());
 		DefaultRowHeaderDataLayer rowHeaderDataLayer = new DefaultRowHeaderDataLayer(rowHeaderDataProvider);
 		RowHeaderLayer rowHeaderLayer = new RowHeaderLayer(rowHeaderDataLayer, compFreeze, selectionLayer);
 
@@ -145,7 +144,11 @@ public class _200_Group_by extends AbstractNatExample {
 		CornerLayer cornerLayer = new CornerLayer(cornerDataLayer, rowHeaderLayer, columnHeaderLayer);
 
 		// Grid
-		GridLayer gridLayer = new GridLayer(compFreeze, columnHeaderLayer, rowHeaderLayer, cornerLayer, false);
+		GridLayer gridLayer = new GridLayer(
+			compFreeze,
+			columnHeaderLayer,
+			rowHeaderLayer,
+			cornerLayer, false);
 
 		CompositeLayer compositeGridLayer = new CompositeLayer(1, 2);
 		final GroupByHeaderLayer groupByHeaderLayer = new GroupByHeaderLayer(groupByModel, gridLayer,

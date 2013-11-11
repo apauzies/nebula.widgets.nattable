@@ -145,11 +145,12 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 	}
 
 	/**
-	 * Simple {@link ExpansionModel} that shows every node expanded initially and doesn't react on
-	 * expand/collapse state changes.
+	 * Simple {@link ExpansionModel} that shows every node expanded initially
+	 * and doesn't react on expand/collapse state changes.
 	 * 
-	 * It is not strictly necessary for implementors to record the expand/collapsed state of all
-	 * nodes, since TreeList caches node state internally.
+	 * It is not strictly necessary for implementors to record the
+	 * expand/collapsed state of all nodes, since TreeList caches node state
+	 * internally.
 	 * 
 	 * @see http://publicobject.com/glazedlists/glazedlists-1.8.0/api/ca/odell/
 	 *      glazedlists/TreeList.ExpansionModel.html
@@ -164,11 +165,12 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 		}
 
 		/**
-		 * Notifies this handler that the specified element's expand/collapse state has changed.
+		 * Notifies this handler that the specified element's expand/collapse
+		 * state has changed.
 		 */
 		@Override
 		public void setExpanded(final Object element, final List<Object> path, final boolean expanded) {
-			// do nothing
+			//do nothing
 		}
 	}
 
