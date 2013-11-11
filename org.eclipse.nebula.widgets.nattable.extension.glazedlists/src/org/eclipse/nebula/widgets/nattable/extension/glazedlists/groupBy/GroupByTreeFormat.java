@@ -63,8 +63,8 @@ public class GroupByTreeFormat<T> implements TreeList.Format<Object> {
 	 * 
 	 * @param model The GroupByModel that carries the information about the groupBy states.
 	 * @param columnAccessor The IColumnAccessor that is used to get the column value
-	 *		for the columns that are grouped by. Needed for compare operations and
-	 *		creating the path in the tree.
+	 *			for the columns that are grouped by. Needed for compare operations and
+	 *			creating the path in the tree.
 	 */
 	public GroupByTreeFormat(GroupByModel model, IColumnAccessor<T> columnAccessor) {
 		this.model = model;
