@@ -127,8 +127,8 @@ public class _200_Group_by extends AbstractNatExample {
 
 		// Register labels
 		labelAccumulator.registerColumnOverrides(
-					RowDataListFixture.getColumnIndexOfProperty(RowDataListFixture.RATING_PROP_NAME),
-					"CUSTOM_COMPARATOR_LABEL");
+						RowDataListFixture.getColumnIndexOfProperty(RowDataListFixture.RATING_PROP_NAME),
+						"CUSTOM_COMPARATOR_LABEL");
 		labelAccumulator.registerColumnOverrides(8, GroupByDataLayer.SUMMARIZE);
 
 		// Row header layer
