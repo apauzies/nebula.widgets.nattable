@@ -138,17 +138,16 @@ public class _200_Group_by extends AbstractNatExample {
 		RowHeaderLayer rowHeaderLayer = new RowHeaderLayer(rowHeaderDataLayer, compFreeze, selectionLayer);
 
 		// Corner layer
-		DefaultCornerDataProvider cornerDataProvider = new DefaultCornerDataProvider(columnHeaderDataProvider,
-				rowHeaderDataProvider);
+		DefaultCornerDataProvider cornerDataProvider = new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider);
 		DataLayer cornerDataLayer = new DataLayer(cornerDataProvider);
 		CornerLayer cornerLayer = new CornerLayer(cornerDataLayer, rowHeaderLayer, columnHeaderLayer);
 
 		// Grid
 		GridLayer gridLayer = new GridLayer(
-			compFreeze,
-			columnHeaderLayer,
-			rowHeaderLayer,
-			cornerLayer, false);
+				compFreeze,
+				columnHeaderLayer,
+				rowHeaderLayer,
+				cornerLayer, false);
 
 		CompositeLayer compositeGridLayer = new CompositeLayer(1, 2);
 		final GroupByHeaderLayer groupByHeaderLayer = new GroupByHeaderLayer(groupByModel, gridLayer,
