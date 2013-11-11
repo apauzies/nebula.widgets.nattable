@@ -39,8 +39,7 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 	 */
 	public static final String GROUP_BY_OBJECT = "GROUP_BY_OBJECT"; //$NON-NLS-1$
 	/**
-	 * Label that indicates the shown tree item object should summarize its
-	 * children
+	 * Label that indicates the shown tree item object should summarize its children
 	 */
 	public static final String SUMMARIZE = "SUMMARIZE"; //$NON-NLS-1$
 	/**
@@ -52,13 +51,11 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 	 */
 	private final GlazedListTreeData<Object> treeData;
 	/**
-	 * The ITreeRowModel that is responsible to retrieve information and operate
-	 * on tree items.
+	 * The ITreeRowModel that is responsible to retrieve information and operate on tree items.
 	 */
 	private final GlazedListTreeRowModel<Object> treeRowModel;
 	/**
-	 * The TreeList that is created internally by this GroupByDataLayer to
-	 * enable groupBy.
+	 * The TreeList that is created internally by this GroupByDataLayer to enable groupBy.
 	 */
 	private final TreeList<Object> treeList;
 
@@ -83,9 +80,9 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 				columnAccessor = new GroupBySummaryColumnAccessor(columnAccessor, summaryProviderByColumn);
 			}
 		} else {
-			 columnAccessor = new GroupByColumnAccessor<T>(columnAccessor);
+			columnAccessor = new GroupByColumnAccessor<T>(columnAccessor);
 		}
-		
+
 		treeFormat = new GroupByTreeFormat<T>(groupByModel, columnAccessor);
 		this.treeList = new TreeList(eventList, treeFormat, new GroupByExpansionModel());
 		treeData = new GlazedListTreeData<Object>(getTreeList());
@@ -105,9 +102,7 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 	 * Need this workaround to update the tree list for presentation because of
 	 * http://java.net/jira/browse/GLAZEDLISTS-521
 	 * 
-	 * @see http 
-	 *      ://glazedlists.1045722.n5.nabble.com/sorting-a-treelist-td4704550
-	 *      .html
+	 * @see http://glazedlists.1045722.n5.nabble.com/sorting-a-treelist-td4704550.html
 	 */
 	protected void updateTree() {
 		this.eventList.getReadWriteLock().writeLock().lock();
@@ -127,16 +122,14 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 	}
 
 	/**
-	 * @return The ITreeRowModel that is responsible to retrieve information and
-	 *         operate on tree items.
+	 * @return The ITreeRowModel that is responsible to retrieve information and operate on tree items.
 	 */
 	public GlazedListTreeRowModel<Object> getTreeRowModel() {
 		return treeRowModel;
 	}
 
 	/**
-	 * @return The TreeList that is created internally by this GroupByDataLayer
-	 *         to enable groupBy.
+	 * @return The TreeList that is created internally by this GroupByDataLayer to enable groupBy.
 	 */
 	public TreeList<Object> getTreeList() {
 		return treeList;
@@ -151,74 +144,12 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 		return configLabels;
 	}
 
-	// @Override
-	// public Object getDataValueByPosition(int columnPosition, int rowPosition)
-	// {
-	// if (isSummaryPosition(columnPosition, rowPosition)) {
-	// GroupByObject group = (GroupByObject)
-	// super.getDataValueByPosition(columnPosition, rowPosition);
-	// Object summaryValue = calculateNewSummaryValue(group, rowPosition,
-	// columnPosition);
-	// group.summaryValueByColumn.put(columnPosition, summaryValue);
-	// return summaryValue;
-	// }
-	// return super.getDataValueByPosition(columnPosition, rowPosition);
-	// }
-
-	// protected boolean isSummaryPosition(int columnPosition, int rowPosition)
-	// {
-	// ILayerCell cell = getCellByPosition(columnPosition, rowPosition);
-	// if (cell == null) {
-	// return false;
-	// }
-	// return cell.getConfigLabels().hasLabel(SUMMARIZE)
-	// && cell.getConfigLabels().hasLabel(GroupByDataLayer.GROUP_BY_OBJECT);
-	// }
-
-	// private Object calculateNewSummaryValue(final GroupByObject group, final
-	// int rowPosition, final int columnPosition) {
-	//
-	// // Get the summary provider from the configuration registry
-	// LabelStack labelStack = getConfigLabelsByPosition(columnPosition,
-	// rowPosition);
-	//
-	// @SuppressWarnings("unchecked")
-	// final IGroupBySummaryProvider<T> summaryProvider =
-	// (IGroupBySummaryProvider<T>) configRegistry
-	// .getConfigAttribute(GroupBySummaryConfigAttributes.SUMMARY_GROUP_PROVIDER,
-	// DisplayMode.NORMAL,
-	// labelStack.getLabels());
-	//
-	// // If there is no Summary provider - skip processing
-	// if (summaryProvider == IGroupBySummaryProvider.NONE) {
-	//			return ""; //$NON-NLS-1$
-	// }
-	//
-	// // List<Integer> childRowIndexes = ((TreeLayer) //
-	// // underlyingLayer).getModel().getChildIndexes(rowPosition);
-	// List<T> children = getElementsInGroup(group);
-	//
-	// Object summaryValue = calculateGroupSummary(columnPosition, children,
-	// summaryProvider);
-	// return summaryValue;
-	// }
-
-	// private Object calculateGroupSummary(int columnIndex, List<T> children,
-	// IGroupBySummaryProvider<T> summaryProvider) {
-	// Object summaryValue = null;
-	// if (summaryProvider != null) {
-	// summaryValue = summaryProvider.summarize(columnIndex, children);
-	// }
-	// return summaryValue;
-	// }
-
 	/**
-	 * Simple {@link ExpansionModel} that shows every node expanded initially
-	 * and doesn't react on expand/collapse state changes.
+	 * Simple {@link ExpansionModel} that shows every node expanded initially and doesn't react on
+	 * expand/collapse state changes.
 	 * 
-	 * It is not strictly necessary for implementors to record the
-	 * expand/collapsed state of all nodes, since TreeList caches node state
-	 * internally.
+	 * It is not strictly necessary for implementors to record the expand/collapsed state of all
+	 * nodes, since TreeList caches node state internally.
 	 * 
 	 * @see http://publicobject.com/glazedlists/glazedlists-1.8.0/api/ca/odell/
 	 *      glazedlists/TreeList.ExpansionModel.html
@@ -233,8 +164,7 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 		}
 
 		/**
-		 * Notifies this handler that the specified element's expand/collapse
-		 * state has changed.
+		 * Notifies this handler that the specified element's expand/collapse state has changed.
 		 */
 		@Override
 		public void setExpanded(final Object element, final List<Object> path, final boolean expanded) {

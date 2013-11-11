@@ -23,13 +23,12 @@ import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import ca.odell.glazedlists.TreeList;
 
 /**
- * The TreeList.Format that is used by the TreeList that is created and used by
- * the GroupByDataLayer. Note that the TreeList created by the GroupByDataLayer
- * is generic for Object because the groupBy functionality will add
- * GroupByObjects to the path for creating the grouping.
+ * The TreeList.Format that is used by the TreeList that is created and used by the
+ * GroupByDataLayer. Note that the TreeList created by the GroupByDataLayer is generic for
+ * Object because the groupBy functionality will add GroupByObjects to the path for creating
+ * the grouping.
  * 
- * @param <T>
- *            The type of the base objects carried in the TreeList.
+ * @param <T> The type of the base objects carried in the TreeList.
  */
 public class GroupByTreeFormat<T> implements TreeList.Format<Object> {
 
@@ -38,41 +37,34 @@ public class GroupByTreeFormat<T> implements TreeList.Format<Object> {
 	 */
 	private final GroupByModel model;
 	/**
-	 * The IColumnAccessor that is used to get the column value for the columns
-	 * that are grouped by. Needed for compare operations and creating the path
-	 * in the tree.
+	 * The IColumnAccessor that is used to get the column value for the columns that are grouped by.
+	 * Needed for compare operations and creating the path in the tree.
 	 */
 	private final IColumnAccessor<T> columnAccessor;
 	/**
-	 * Comparator that is used to sort the TreeList based on the groupBy
-	 * information.
+	 * Comparator that is used to sort the TreeList based on the groupBy information.
 	 */
 	private final GroupByComparator groupByComparator = new GroupByComparator();
 	/**
 	 * To provide sorting functionality
 	 */
 	private ISortModel sortModel;
+
 	/**
 	 * Only used for sorting with aggregated values on summary/group row
 	 */
-	//private IColumnAccessor groupBySummaryColumnAccessor;
+	// private IColumnAccessor groupBySummaryColumnAccessor;
 
-//	public GroupByTreeFormat(GroupByModel model, IColumnAccessor<T> columnAccessor) {
-//		this(model, columnAccessor);
-//	}
+	// public GroupByTreeFormat(GroupByModel model, IColumnAccessor<T> columnAccessor) {
+	// this(model, columnAccessor);
+	// }
 
 	/**
 	 * 
-	 * @param model
-	 *            The GroupByModel that carries the information about the
-	 *            groupBy states.
-	 * @param columnAccessor
-	 *            The IColumnAccessor that is used to get the column value for
-	 *            the columns that are grouped by. Needed for compare operations
-	 *            and creating the path in the tree.
-	 * @param aggregatorColumnAccessor
-	 *            Only used for sorting with aggregated values on summary/group
-	 *            row
+	 * @param model The GroupByModel that carries the information about the groupBy states.
+	 * @param columnAccessor The IColumnAccessor that is used to get the column value
+	 *		 for the columns that are grouped by. Needed for compare operations and
+	 *		 creating the path in the tree.
 	 */
 	public GroupByTreeFormat(GroupByModel model, IColumnAccessor<T> columnAccessor) {
 		this.model = model;
@@ -86,12 +78,15 @@ public class GroupByTreeFormat<T> implements TreeList.Format<Object> {
 		if (!groupByColunns.isEmpty()) {
 			List<Entry<Integer, Object>> descriptor = new ArrayList<Entry<Integer, Object>>();
 			for (int columnIndex : groupByColunns) {
-				// add a GroupByObject that contains the value contained in the column which is grouped
+				// add a GroupByObject that contains the value contained in the column which is
+				// grouped
 				Object columnValue = columnAccessor.getDataValue((T) element, columnIndex);
 				descriptor.add(new AbstractMap.SimpleEntry<Integer, Object>(columnIndex, columnValue));
+				// path.add(new GroupByObject(columnValue, descriptor));
 			}
 			for (int columnIndex : groupByColunns) {
-				// add a GroupByObject that contains the value contained in the column which is grouped
+				// add a GroupByObject that contains the value contained in the column which is
+				// grouped
 				Object columnValue = columnAccessor.getDataValue((T) element, columnIndex);
 				path.add(new GroupByObject(columnValue, descriptor));
 			}
@@ -106,7 +101,7 @@ public class GroupByTreeFormat<T> implements TreeList.Format<Object> {
 
 	@Override
 	public Comparator<Object> getComparator(int depth) {
-		// if there is no grouping we do not provide a comparator for the tree
+		//if there is no grouping we do not provide a comparator for the tree
 		if (this.model.getGroupByColumnIndexes().isEmpty()) {
 			return null;
 		}
@@ -119,8 +114,7 @@ public class GroupByTreeFormat<T> implements TreeList.Format<Object> {
 	}
 
 	/**
-	 * Comparator that is used to sort the TreeList based on the groupBy
-	 * information.
+	 * Comparator that is used to sort the TreeList based on the groupBy information.
 	 * 
 	 * @author Dirk Fauth
 	 * 
@@ -156,9 +150,10 @@ public class GroupByTreeFormat<T> implements TreeList.Format<Object> {
 										GroupByObject grp1 = (GroupByObject) o1;
 										GroupByObject grp2 = (GroupByObject) o2;
 										columnValue1 = columnAccessor.getDataValue((T) grp1, sortedColumnIndex);
-										columnValue2 = columnAccessor.getDataValue((T) grp2, sortedColumnIndex);										
+										columnValue2 = columnAccessor.getDataValue((T) grp2, sortedColumnIndex);
 										if (columnValue1 != null && columnValue2 != null) {
-											int res = DefaultComparator.getInstance().compare(columnValue1, columnValue2);
+											int res = DefaultComparator.getInstance().compare(columnValue1,
+													columnValue2);
 											if (res == 0) {
 												continue;
 											}
