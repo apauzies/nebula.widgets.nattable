@@ -86,8 +86,7 @@ public class _200_Group_by extends AbstractNatExample {
 		EventList<RowDataFixture> eventList = GlazedLists.eventList(RowDataListFixture.getList(200));
 		String[] propertyNames = RowDataListFixture.getPropertyNames();
 		Map<String, String> propertyToLabelMap = RowDataListFixture.getPropertyToLabelMap();
-		IColumnPropertyAccessor<RowDataFixture> reflectiveColumnPropertyAccessor = new ReflectiveColumnPropertyAccessor<RowDataFixture>(
-				propertyNames);
+		IColumnPropertyAccessor<RowDataFixture> reflectiveColumnPropertyAccessor = new ReflectiveColumnPropertyAccessor<RowDataFixture>(propertyNames);
 
 		GroupByModel groupByModel = new GroupByModel();
 
@@ -150,8 +149,7 @@ public class _200_Group_by extends AbstractNatExample {
 				cornerLayer, false);
 
 		CompositeLayer compositeGridLayer = new CompositeLayer(1, 2);
-		final GroupByHeaderLayer groupByHeaderLayer = new GroupByHeaderLayer(groupByModel, gridLayer,
-				columnHeaderDataProvider);
+		final GroupByHeaderLayer groupByHeaderLayer = new GroupByHeaderLayer(groupByModel, gridLayer, columnHeaderDataProvider);
 		compositeGridLayer.setChildLayer(GroupByHeaderLayer.GROUP_BY_REGION, groupByHeaderLayer, 0, 0);
 		compositeGridLayer.setChildLayer("Grid", gridLayer, 0, 1);
 
