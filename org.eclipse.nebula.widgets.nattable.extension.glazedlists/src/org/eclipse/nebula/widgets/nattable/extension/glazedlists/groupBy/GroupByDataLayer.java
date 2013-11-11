@@ -108,7 +108,8 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 		this.eventList.getReadWriteLock().writeLock().lock();
 		try {
 			for (int i = 0; i < this.eventList.size(); i++) {
-				this.eventList.set(i, this.eventList.get(i));
+				this.eventList.set(i,
+					this.eventList.get(i));
 			}
 		} finally {
 			this.eventList.getReadWriteLock().writeLock().unlock();
