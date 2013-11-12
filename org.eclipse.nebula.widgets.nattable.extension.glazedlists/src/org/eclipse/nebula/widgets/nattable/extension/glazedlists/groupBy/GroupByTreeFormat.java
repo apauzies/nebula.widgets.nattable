@@ -70,7 +70,7 @@ public class GroupByTreeFormat<T> implements TreeList.Format<Object> {
 			List<Entry<Integer, Object>> descriptor = new ArrayList<Entry<Integer, Object>>();		
 			for (int columnIndex : groupByColunns) {
 				// Build a unique descriptor for the group
-				String columnValue = (String) columnAccessor.getDataValue((T) element, columnIndex);
+				Object columnValue = columnAccessor.getDataValue((T) element, columnIndex);
 				descriptor.add(new AbstractMap.SimpleEntry<Integer, Object>(columnIndex, columnValue));
 				GroupByObject groupByObject = new GroupByObject(columnValue, new ArrayList<Entry<Integer, Object>>(descriptor));
 				path.add(groupByObject);
