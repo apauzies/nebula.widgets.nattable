@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -20,20 +21,21 @@ import org.eclipse.nebula.widgets.nattable.config.DefaultComparator;
  * Contains the value that is used for grouping and the grouping index to ensure the correct
  * ordering.
  */
-public class GroupByObject implements Comparable<GroupByObject> {
+public final class GroupByObject implements Comparable<GroupByObject> {
 
 	/** The columnIndex->value */
 	private final List<Entry<Integer, Object>> descriptor;
+
 	/**
 	 * The value that is used for grouping.
 	 */
-	private final Object value;
+	private final String value;
 
 	/**
 	 * @param value The value that is used for grouping.
 	 * @param descriptor The description of the grouping (Index->Value)
 	 */
-	public GroupByObject(Object value, List<Entry<Integer, Object>> descriptor) {
+	public GroupByObject(String value, List<Entry<Integer, Object>> descriptor) {
 		this.value = value;
 		this.descriptor = descriptor;
 	}
@@ -48,35 +50,30 @@ public class GroupByObject implements Comparable<GroupByObject> {
 	/**
 	 * @return The description of the grouping (Index->Value)
 	 */
-	public List<Entry<Integer, Object>> getDescriptor() {
+	public Collection<Entry<Integer, Object>> getDescriptor() {
 		return descriptor;
 	}
 
 	@Override
 	public String toString() {
-		//Without adjusting a lot of API and adding dependencies to the DataLayer and the ConfigRegistry
-		//we can not get the IDataConverter here. It might be solvable with the next generation because
-		//we can then inject the necessary values. Until then you should consider implementing toString()
+		// Without adjusting a lot of API and adding dependencies to the DataLayer and the ConfigRegistry
+		// we can not get the IDataConverter here. It might be solvable with the next generation because
+		// we can then inject the necessary values. Until then you should consider implementing toString()
 		return value.toString();
 	}
 
 	@Override
 	public int compareTo(GroupByObject o) {
-		int size1 = getDescriptor().size();
-		int size2 = o.getDescriptor().size();
+		//if we have several groupings, the comparison is performed on the group by order
+		int result = Integer.valueOf(this.descriptor.hashCode()).compareTo(o.descriptor.hashCode());
 
-		int minSize = size1 > size2 ? size2 : size1;
-		int result = 0;
-		for (int i = 0; i < minSize; i++) {
-			result = DefaultComparator.getInstance().compare(getDescriptor().get(i).getValue(),
-					o.getDescriptor().get(i).getValue());
-			if (result != 0) {
-				// if (i == minSize - 1 && size1 == size2) {
-				// return 0;
-				// }
-				return result;
+		if (result == 0) {
+			//if the datatypes are not the same here, comparison is not possible
+			if (this.value.getClass().equals(o.value.getClass())) {
+				result = DefaultComparator.getInstance().compare(value, o.value);
 			}
 		}
+
 		return result;
 	}
 

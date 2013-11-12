@@ -51,15 +51,6 @@ public class GroupByTreeFormat<T> implements TreeList.Format<Object> {
 	private ISortModel sortModel;
 
 	/**
-	 * Only used for sorting with aggregated values on summary/group row
-	 */
-	// private IColumnAccessor groupBySummaryColumnAccessor;
-
-	// public GroupByTreeFormat(GroupByModel model, IColumnAccessor<T> columnAccessor) {
-	// this(model, columnAccessor);
-	// }
-
-	/**
 	 * 
 	 * @param model The GroupByModel that carries the information about the groupBy states.
 	 * @param columnAccessor The IColumnAccessor that is used to get the column value
@@ -76,19 +67,13 @@ public class GroupByTreeFormat<T> implements TreeList.Format<Object> {
 	public void getPath(List<Object> path, Object element) {
 		List<Integer> groupByColunns = model.getGroupByColumnIndexes();
 		if (!groupByColunns.isEmpty()) {
-			List<Entry<Integer, Object>> descriptor = new ArrayList<Entry<Integer, Object>>();
+			List<Entry<Integer, Object>> descriptor = new ArrayList<Entry<Integer, Object>>();		
 			for (int columnIndex : groupByColunns) {
-				// add a GroupByObject that contains the value contained in the column which is
-				// grouped
-				Object columnValue = columnAccessor.getDataValue((T) element, columnIndex);
+				// Build a unique descriptor for the group
+				String columnValue = (String) columnAccessor.getDataValue((T) element, columnIndex);
 				descriptor.add(new AbstractMap.SimpleEntry<Integer, Object>(columnIndex, columnValue));
-				// path.add(new GroupByObject(columnValue, descriptor));
-			}
-			for (int columnIndex : groupByColunns) {
-				// add a GroupByObject that contains the value contained in the column which is
-				// grouped
-				Object columnValue = columnAccessor.getDataValue((T) element, columnIndex);
-				path.add(new GroupByObject(columnValue, descriptor));
+				GroupByObject groupByObject = new GroupByObject(columnValue, new ArrayList<Entry<Integer, Object>>(descriptor));
+				path.add(groupByObject);
 			}
 		}
 		path.add(element);
