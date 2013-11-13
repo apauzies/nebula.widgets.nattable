@@ -21,7 +21,7 @@ import org.eclipse.nebula.widgets.nattable.config.DefaultComparator;
  * Contains the value that is used for grouping and the grouping index to ensure the correct
  * ordering.
  */
-public final class GroupByObject implements Comparable<GroupByObject> {
+public class GroupByObject implements Comparable<GroupByObject> {
 
 	/** The columnIndex->value */
 	private final List<Entry<Integer, Object>> descriptor;
