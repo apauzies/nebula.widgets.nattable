@@ -10,12 +10,11 @@
  ******************************************************************************/
 package org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IColumnAccessor;
@@ -31,9 +30,7 @@ import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 
 import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.TreeList;
-import ca.odell.glazedlists.matchers.Matcher;
 
 public class GroupByDataLayer<T> extends DataLayer implements Observer {
 
@@ -64,10 +61,7 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 
 	private final GroupByTreeFormat<T> treeFormat;
 	
-	private final IColumnAccessor<T> columnAccessor;
-	
 	/** Map the group to a dynamic list of group elements */
-	private final Map<GroupByObject, FilterList<T>> filtersByGroup = new ConcurrentHashMap<GroupByObject, FilterList<T>>();
 
 	public GroupByDataLayer(GroupByModel groupByModel, EventList<T> eventList, IColumnAccessor<T> columnAccessor) {
 		this(groupByModel, eventList, columnAccessor, null);
@@ -77,7 +71,6 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 	public GroupByDataLayer(GroupByModel groupByModel, EventList<T> eventList, IColumnAccessor<T> columnAccessor,
 			IConfigRegistry configRegistry) {
 		this.eventList = eventList;
-		this.columnAccessor = columnAccessor;
 
 		groupByModel.addObserver(this);
 
@@ -184,58 +177,17 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 		}
 	}
 
-//	public List<T> getElementsInGroup(GroupByObject groupDescriptor) {
-//		List<T> children = new ArrayList<T>();
-//		for (Object o : treeData.getChildren(groupDescriptor)) {
-//			if (o instanceof GroupByObject) {
-//				children.addAll(getElementsInGroup((GroupByObject) o));
-//			} else {
-//				children.add((T) o);
-//			}
-//		}
-//		return children;
-//	}
-
-	/**
-	 * To find out if an element is part of a group
-	 */
-	public static class GroupDescriptorMatcher<T> implements Matcher<T> {
-
-		private final GroupByObject group;
-		private final IColumnAccessor<T> columnAccessor;
-
-		public GroupDescriptorMatcher(GroupByObject group, IColumnAccessor<T> columnAccessor) {
-			this.group = group;
-			this.columnAccessor = columnAccessor;
-		}
-
-		@Override
-		public boolean matches(T element) {
-			for (Entry<Integer, Object> desc : group.getDescriptor()) {
-				int columnIndex = desc.getKey();
-				Object groupName = desc.getValue();
-				if (!groupName.equals(columnAccessor.getDataValue((T) element, columnIndex))) {
-					return false;
-				}
+	public List<T> getElementsInGroup(GroupByObject groupDescriptor) {
+		List<T> children = new ArrayList<T>();
+		for (Object o : treeData.getChildren(groupDescriptor, true)) {
+			if (o instanceof GroupByObject) {
+				// do nothing
+			} else {
+				children.add((T) o);
 			}
-			return true;
 		}
+		return children;
 	}
-
-	/**
-	 * Get the list of elements for a group, create it if it doesn't exists.
-	 * @param groupDescriptor The description of the group (columnIndexes..)
-	 * @return The FilterList of elements
-	 */
-	public FilterList<T> getElementsInGroup(GroupByObject groupDescriptor) {
-		FilterList<T> elementsInGroup = filtersByGroup.get(groupDescriptor);
-		if (elementsInGroup == null) {
-			elementsInGroup = new FilterList<T>(eventList, new GroupDescriptorMatcher<T>(groupDescriptor, columnAccessor));
-			filtersByGroup.put(groupDescriptor, elementsInGroup);
-		}
-		return elementsInGroup;
-	}
-
 	
 	public class GroupBySummaryColumnAccessor extends GroupByColumnAccessor<T> {
 
