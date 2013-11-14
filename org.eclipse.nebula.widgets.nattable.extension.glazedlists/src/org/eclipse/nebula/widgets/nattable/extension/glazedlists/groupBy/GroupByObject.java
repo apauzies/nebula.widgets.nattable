@@ -17,9 +17,7 @@ import java.util.Map.Entry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultComparator;
 
 /**
- * This class is used to add tree items that are added to the tree path for grouping purposes.
- * Contains the value that is used for grouping and the grouping index to ensure the correct
- * ordering.
+ * This class is used to add tree items that are added to the tree path for grouping purposes. Contains the value that is used for grouping and the grouping index to ensure the correct ordering.
  */
 public class GroupByObject implements Comparable<GroupByObject> {
 
@@ -32,8 +30,10 @@ public class GroupByObject implements Comparable<GroupByObject> {
 	private final Object value;
 
 	/**
-	 * @param value The value that is used for grouping.
-	 * @param descriptor The description of the grouping (Index->Value)
+	 * @param value
+	 *            The value that is used for grouping.
+	 * @param descriptor
+	 *            The description of the grouping (Index->Value)
 	 */
 	public GroupByObject(Object value, List<Entry<Integer, Object>> descriptor) {
 		this.value = value;
@@ -56,25 +56,18 @@ public class GroupByObject implements Comparable<GroupByObject> {
 
 	@Override
 	public String toString() {
-		//Without adjusting a lot of API and adding dependencies to the DataLayer and the ConfigRegistry
-		//we can not get the IDataConverter here. It might be solvable with the next generation because
-		//we can then inject the necessary values. Until then you should consider implementing toString()
+		// Without adjusting a lot of API and adding dependencies to the DataLayer and the ConfigRegistry
+		// we can not get the IDataConverter here. It might be solvable with the next generation because
+		// we can then inject the necessary values. Until then you should consider implementing toString()
 		return value.toString();
 	}
 
 	@Override
 	public int compareTo(GroupByObject o) {
-		//if we have several groupings, the comparison is performed on the group by order
-		int result = Integer.valueOf(this.descriptor.hashCode()).compareTo(o.descriptor.hashCode());
-
-		if (result == 0) {
-			//if the datatypes are not the same here, comparison is not possible
-			if (this.value.getClass().equals(o.value.getClass())) {
-				result = DefaultComparator.getInstance().compare(value, o.value);
-			}
+		if (this.value.getClass().equals(o.value.getClass())) {
+			return DefaultComparator.getInstance().compare(value, o.value);
 		}
-
-		return result;
+		return Integer.valueOf(this.descriptor.hashCode()).compareTo(o.descriptor.hashCode());
 	}
 
 	@Override

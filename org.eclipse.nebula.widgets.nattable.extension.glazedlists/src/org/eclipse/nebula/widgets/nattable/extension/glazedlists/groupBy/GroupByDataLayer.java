@@ -19,6 +19,7 @@ import java.util.Observer;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IColumnAccessor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsDataProvider;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.GroupBySummaryColumnAccessor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.GroupBySummaryConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.IGroupBySummaryProvider;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.tree.GlazedListTreeData;
@@ -72,25 +73,28 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 			IConfigRegistry configRegistry) {
 		this.eventList = eventList;
 
-		groupByModel.addObserver(this);
-
+		groupByModel.addObserver(this);		
+		
+		IColumnAccessor<T> groupByColumnAccessor = null;
 		// Check if we need to summarize some group columns
 		if (configRegistry != null) {
 			Map<Integer, IGroupBySummaryProvider> summaryProviderByColumn = configRegistry.getConfigAttribute(
 					GroupBySummaryConfigAttributes.GROUP_BY_SUMMARY_PROVIDER, DisplayMode.NORMAL);
 			if (!summaryProviderByColumn.isEmpty()) {
-				columnAccessor = new GroupBySummaryColumnAccessor(columnAccessor, summaryProviderByColumn);
+				groupByColumnAccessor = new GroupBySummaryColumnAccessor(columnAccessor, summaryProviderByColumn, this);
 			}
-		} else {
-			columnAccessor = new GroupByColumnAccessor<T>(columnAccessor);
+		}		
+		if (groupByColumnAccessor == null) {
+			groupByColumnAccessor = new GroupByColumnAccessor(columnAccessor);
 		}
-
-		treeFormat = new GroupByTreeFormat<T>(groupByModel, columnAccessor);
+		
+		treeFormat = new GroupByTreeFormat<T>(groupByModel, groupByColumnAccessor);
 		this.treeList = new TreeList(eventList, treeFormat, new GroupByExpansionModel());
+		
 		treeData = new GlazedListTreeData<Object>(getTreeList());
-		treeRowModel = new GlazedListTreeRowModel<Object>(treeData);
-
-		setDataProvider(new GlazedListsDataProvider<Object>(getTreeList(), (IColumnAccessor<Object>) columnAccessor));
+		treeRowModel = new GlazedListTreeRowModel<Object>(treeData);		
+		
+		setDataProvider(new GlazedListsDataProvider<Object>(getTreeList(), (IColumnAccessor<Object>) groupByColumnAccessor));
 
 		addConfiguration(new GroupByDataLayerConfiguration());
 	}
@@ -176,7 +180,8 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 			//do nothing
 		}
 	}
-
+	
+	@SuppressWarnings("unchecked")
 	public List<T> getElementsInGroup(GroupByObject groupDescriptor) {
 		List<T> children = new ArrayList<T>();
 		for (Object o : treeData.getChildren(groupDescriptor, true)) {
@@ -188,34 +193,5 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 		}
 		return children;
 	}
-	
-	public class GroupBySummaryColumnAccessor extends GroupByColumnAccessor<T> {
 
-		private final Map<Integer, IGroupBySummaryProvider> summaryProviderByColumn;
-
-		public GroupBySummaryColumnAccessor(IColumnAccessor<T> columnAccessor,
-				Map<Integer, IGroupBySummaryProvider> summaryProviderByColumn) {
-			super(columnAccessor);
-			this.summaryProviderByColumn = summaryProviderByColumn;
-		}
-
-		@SuppressWarnings("unchecked")
-		public Object getDataValue(Object rowObject, int columnIndex) {
-			if (rowObject instanceof GroupByObject) {
-				IGroupBySummaryProvider<T> summaryProvider = summaryProviderByColumn.get(columnIndex);
-				GroupByObject groupByObject = (GroupByObject) rowObject;
-				if (summaryProvider == null) {
-					if (columnIndex == 0) {
-						// Print the name of the group
-						return groupByObject.getValue();
-					}
-					return ""; //$NON-NLS-1$ // No aggregation, print nothing
-				}
-				List<T> children = getElementsInGroup(groupByObject);
-				return summaryProvider.summarize(columnIndex, children);
-			} else {
-				return columnAccessor.getDataValue((T) rowObject, columnIndex);
-			}
-		}
-	}
 }

@@ -12,7 +12,7 @@ package org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy;
 
 import org.eclipse.nebula.widgets.nattable.data.IColumnAccessor;
 
-public class GroupByColumnAccessor<T> implements IColumnAccessor<T> {
+public class GroupByColumnAccessor<T> implements IColumnAccessor<Object> {
 
 	protected final IColumnAccessor<T> columnAccessor;
 

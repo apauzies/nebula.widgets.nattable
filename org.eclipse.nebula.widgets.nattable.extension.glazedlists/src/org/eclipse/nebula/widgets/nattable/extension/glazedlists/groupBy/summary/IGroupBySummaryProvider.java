@@ -6,16 +6,16 @@ public interface IGroupBySummaryProvider<T> {
 
 	public static final Object DEFAULT_SUMMARY_VALUE = "..."; //$NON-NLS-1$
 
-	/**
-	 * Register this instance to indicate that a summary is not required. Doing so avoids calls to
-	 * the {@link IGroupBySummaryProvider} and is a performance tweak.
-	 */
-	public static final IGroupBySummaryProvider NONE = new IGroupBySummaryProvider() {
-		@Override
-		public Object summarize(int columnIndex, List children) {
-			return null;
-		}
-	};
+//	/**
+//	 * Register this instance to indicate that a summary is not required. Doing so avoids calls to
+//	 * the {@link IGroupBySummaryProvider} and is a performance tweak.
+//	 */
+//	public static final IGroupBySummaryProvider<?> NONE = new IGroupBySummaryProvider<Object>() {
+//		@Override
+//		public Object summarize(int columnIndex, List<Object> children) {
+//			return null;
+//		}
+//	};
 
 	/**
 	 * @param columnIndex The column index of the column for which the summary should be calculated.
