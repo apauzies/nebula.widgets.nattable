@@ -61,7 +61,7 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 	private final TreeList<Object> treeList;
 
 	private final GroupByTreeFormat<T> treeFormat;
-	
+
 	/** Map the group to a dynamic list of group elements */
 
 	public GroupByDataLayer(GroupByModel groupByModel, EventList<T> eventList, IColumnAccessor<T> columnAccessor) {
@@ -73,27 +73,22 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 			IConfigRegistry configRegistry) {
 		this.eventList = eventList;
 
-		groupByModel.addObserver(this);		
-		
+		groupByModel.addObserver(this);
+
 		IColumnAccessor<T> groupByColumnAccessor = null;
 		// Check if we need to summarize some group columns
 		if (configRegistry != null) {
-			Map<Integer, IGroupBySummaryProvider> summaryProviderByColumn = configRegistry.getConfigAttribute(
-					GroupBySummaryConfigAttributes.GROUP_BY_SUMMARY_PROVIDER, DisplayMode.NORMAL);
-			if (!summaryProviderByColumn.isEmpty()) {
-				groupByColumnAccessor = new GroupBySummaryColumnAccessor(columnAccessor, summaryProviderByColumn, this);
-			}
-		}		
-		if (groupByColumnAccessor == null) {
+			groupByColumnAccessor = new GroupBySummaryColumnAccessor(columnAccessor, configRegistry, this);
+		} else {
 			groupByColumnAccessor = new GroupByColumnAccessor(columnAccessor);
 		}
-		
+
 		treeFormat = new GroupByTreeFormat<T>(groupByModel, groupByColumnAccessor);
 		this.treeList = new TreeList(eventList, treeFormat, new GroupByExpansionModel());
-		
+
 		treeData = new GlazedListTreeData<Object>(getTreeList());
-		treeRowModel = new GlazedListTreeRowModel<Object>(treeData);		
-		
+		treeRowModel = new GlazedListTreeRowModel<Object>(treeData);
+
 		setDataProvider(new GlazedListsDataProvider<Object>(getTreeList(), (IColumnAccessor<Object>) groupByColumnAccessor));
 
 		addConfiguration(new GroupByDataLayerConfiguration());
@@ -160,7 +155,7 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 	 * internally.
 	 * 
 	 * @see http://publicobject.com/glazedlists/glazedlists-1.8.0/api/ca/odell/
-	 *      glazedlists/TreeList.ExpansionModel.html
+	 * glazedlists/TreeList.ExpansionModel.html
 	 */
 	private class GroupByExpansionModel implements TreeList.ExpansionModel<Object> {
 		/**
@@ -180,7 +175,7 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 			//do nothing
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<T> getElementsInGroup(GroupByObject groupDescriptor) {
 		List<T> children = new ArrayList<T>();

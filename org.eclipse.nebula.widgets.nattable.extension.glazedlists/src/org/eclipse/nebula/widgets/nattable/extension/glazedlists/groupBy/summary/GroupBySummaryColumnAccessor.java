@@ -1,28 +1,48 @@
 package org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IColumnAccessor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByColumnAccessor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByDataLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByObject;
+import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 
 public class GroupBySummaryColumnAccessor<T> extends GroupByColumnAccessor<Object> {
 
-	private final Map<Integer, IGroupBySummaryProvider<T>> summaryProviderByColumn;
+	private Map<Integer, IGroupBySummaryProvider<T>> summaryProviderByColumn;
 	private final GroupByDataLayer<T> groupByDataLayer;
+	private final IConfigRegistry configRegistry;
+
+	private Map<Integer, IGroupBySummaryProvider<T>> getSummaryProviderByColumn() {
+		if (summaryProviderByColumn == null) {
+			summaryProviderByColumn = new HashMap<Integer, IGroupBySummaryProvider<T>>();
+			for (int columnIndex = 0; columnIndex < groupByDataLayer.getColumnCount(); columnIndex++) {
+				int columnPosition = groupByDataLayer.getColumnPositionByIndex(columnIndex);
+				List<String> labels = groupByDataLayer.getConfigLabelsByPosition(columnPosition, 0).getLabels();
+				IGroupBySummaryProvider<T> summaryProvider = configRegistry.getConfigAttribute(
+						GroupBySummaryConfigAttributes.GROUP_BY_SUMMARY_PROVIDER, DisplayMode.NORMAL, labels);
+				if (summaryProvider != null) {
+					summaryProviderByColumn.put(columnIndex, summaryProvider);
+				}
+			}
+		}
+		return summaryProviderByColumn;
+	}
 
 	public GroupBySummaryColumnAccessor(IColumnAccessor<Object> columnAccessor,
-			Map<Integer, IGroupBySummaryProvider<T>> summaryProviderByColumn, GroupByDataLayer<T> groupByDataLayer) {
+			IConfigRegistry configRegistry, GroupByDataLayer<T> groupByDataLayer) {
 		super(columnAccessor);
 		this.groupByDataLayer = groupByDataLayer;
-		this.summaryProviderByColumn = summaryProviderByColumn;
+		this.configRegistry = configRegistry;
 	}
-	
+
 	public Object getDataValue(Object rowObject, int columnIndex) {
 		if (rowObject instanceof GroupByObject) {
-			IGroupBySummaryProvider<T> summaryProvider = summaryProviderByColumn.get(columnIndex);
+			IGroupBySummaryProvider<T> summaryProvider = getSummaryProviderByColumn().get(columnIndex);
 			GroupByObject groupByObject = (GroupByObject) rowObject;
 			if (summaryProvider == null) {
 				if (columnIndex == 0) {

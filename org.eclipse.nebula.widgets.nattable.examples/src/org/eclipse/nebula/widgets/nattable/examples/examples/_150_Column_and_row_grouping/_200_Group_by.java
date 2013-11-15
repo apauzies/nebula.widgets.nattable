@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.nebula.widgets.nattable.examples.examples._150_Column_and_row_grouping;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
@@ -26,7 +25,6 @@ import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupBy
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByHeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByModel;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.GroupBySummaryConfigAttributes;
-import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.IGroupBySummaryProvider;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.SummationGroupBySummaryProvider;
 import org.eclipse.nebula.widgets.nattable.freeze.CompositeFreezeLayer;
 import org.eclipse.nebula.widgets.nattable.freeze.FreezeLayer;
@@ -92,11 +90,9 @@ public class _200_Group_by extends AbstractNatExample {
 
 		// Summary
 		ConfigRegistry configRegistry = new ConfigRegistry();
-		Map<Integer,IGroupBySummaryProvider> summaryProviderByColumn = new HashMap<Integer,IGroupBySummaryProvider>();
-		summaryProviderByColumn.put(8, new SummationGroupBySummaryProvider<RowDataFixture>(reflectiveColumnPropertyAccessor));		
 		configRegistry.registerConfigAttribute(GroupBySummaryConfigAttributes.GROUP_BY_SUMMARY_PROVIDER,
-				summaryProviderByColumn,
-				DisplayMode.NORMAL);
+				new SummationGroupBySummaryProvider<RowDataFixture>(reflectiveColumnPropertyAccessor),
+				DisplayMode.NORMAL, GroupByDataLayer.SUMMARIZE);
 		
 		GroupByDataLayer<RowDataFixture> bodyDataLayer = new GroupByDataLayer<RowDataFixture>(groupByModel, eventList,
 				reflectiveColumnPropertyAccessor, configRegistry);	
@@ -129,7 +125,9 @@ public class _200_Group_by extends AbstractNatExample {
 		labelAccumulator.registerColumnOverrides(
 						RowDataListFixture.getColumnIndexOfProperty(RowDataListFixture.RATING_PROP_NAME),
 						"CUSTOM_COMPARATOR_LABEL");
-		labelAccumulator.registerColumnOverrides(8, GroupByDataLayer.SUMMARIZE);
+		labelAccumulator.registerColumnOverrides(
+						RowDataListFixture.getColumnIndexOfProperty(RowDataListFixture.LOT_SIZE_PROP_NAME),
+						GroupByDataLayer.SUMMARIZE);	
 
 		// Row header layer
 		DefaultRowHeaderDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(bodyDataLayer.getDataProvider());
