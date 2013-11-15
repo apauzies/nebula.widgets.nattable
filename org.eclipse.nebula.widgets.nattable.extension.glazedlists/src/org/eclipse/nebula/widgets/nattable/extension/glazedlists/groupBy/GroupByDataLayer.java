@@ -12,7 +12,6 @@ package org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -20,15 +19,12 @@ import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IColumnAccessor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsDataProvider;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.GroupBySummaryColumnAccessor;
-import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.GroupBySummaryConfigAttributes;
-import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.IGroupBySummaryProvider;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.tree.GlazedListTreeData;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.tree.GlazedListTreeRowModel;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.event.RowStructuralRefreshEvent;
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
-import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.TreeList;
@@ -76,7 +72,6 @@ public class GroupByDataLayer<T> extends DataLayer implements Observer {
 		groupByModel.addObserver(this);
 
 		IColumnAccessor<T> groupByColumnAccessor = null;
-		// Check if we need to summarize some group columns
 		if (configRegistry != null) {
 			groupByColumnAccessor = new GroupBySummaryColumnAccessor(columnAccessor, configRegistry, this);
 		} else {

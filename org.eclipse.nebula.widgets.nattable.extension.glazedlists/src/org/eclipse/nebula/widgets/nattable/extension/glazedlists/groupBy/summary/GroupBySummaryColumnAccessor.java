@@ -23,6 +23,7 @@ public class GroupBySummaryColumnAccessor<T> extends GroupByColumnAccessor<Objec
 			for (int columnIndex = 0; columnIndex < groupByDataLayer.getColumnCount(); columnIndex++) {
 				int columnPosition = groupByDataLayer.getColumnPositionByIndex(columnIndex);
 				List<String> labels = groupByDataLayer.getConfigLabelsByPosition(columnPosition, 0).getLabels();
+				@SuppressWarnings("unchecked")
 				IGroupBySummaryProvider<T> summaryProvider = configRegistry.getConfigAttribute(
 						GroupBySummaryConfigAttributes.GROUP_BY_SUMMARY_PROVIDER, DisplayMode.NORMAL, labels);
 				if (summaryProvider != null) {
