@@ -44,10 +44,10 @@ public class GroupBySummaryColumnAccessor<T> extends GroupByColumnAccessor<Objec
 	public Object getDataValue(Object rowObject, int columnIndex) {
 		if (rowObject instanceof GroupByObject) {
 			IGroupBySummaryProvider<T> summaryProvider = getSummaryProviderByColumn().get(columnIndex);
-			GroupByObject groupByObject = (GroupByObject) rowObject;
 			if (summaryProvider == null) {
 				return super.getDataValue(rowObject, columnIndex);
 			}
+			GroupByObject groupByObject = (GroupByObject) rowObject;
 			List<T> children = groupByDataLayer.getElementsInGroup(groupByObject);
 			return summaryProvider.summarize(columnIndex, children);
 		} else {
