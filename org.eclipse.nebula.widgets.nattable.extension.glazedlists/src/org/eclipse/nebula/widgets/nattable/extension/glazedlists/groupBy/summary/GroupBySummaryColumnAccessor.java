@@ -46,11 +46,7 @@ public class GroupBySummaryColumnAccessor<T> extends GroupByColumnAccessor<Objec
 			IGroupBySummaryProvider<T> summaryProvider = getSummaryProviderByColumn().get(columnIndex);
 			GroupByObject groupByObject = (GroupByObject) rowObject;
 			if (summaryProvider == null) {
-				if (columnIndex == 0) {
-					// Print the name of the group
-					return groupByObject.getValue();
-				}
-				return ""; //$NON-NLS-1$ // No aggregation, print nothing
+				return super.getDataValue(rowObject, columnIndex);
 			}
 			List<T> children = groupByDataLayer.getElementsInGroup(groupByObject);
 			return summaryProvider.summarize(columnIndex, children);
